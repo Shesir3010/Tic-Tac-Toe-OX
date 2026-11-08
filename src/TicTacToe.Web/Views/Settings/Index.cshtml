@@ -1,0 +1,48 @@
+@* Settings (FR-22): Theme x Sound + Reset to defaults. Browser-only, works for guests. *@
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="ttt-game ttt-card">
+    <h1>Settings</h1>
+
+    <div class="mb-3">
+        <label for="set-theme">Theme</label>
+        <select id="set-theme" class="form-select" aria-label="Theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="device" selected>Device</option>
+        </select>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="set-sound" checked />
+        <label class="form-check-label" for="set-sound">Sound on</label>
+    </div>
+
+    <button id="btn-reset-settings" class="btn btn-outline-primary" type="button">Reset to defaults</button>
+    <a class="btn btn-link" href="/">Back to game</a>
+</div>
+
+@section Scripts {
+    <script type="module">
+      import { applyTheme } from '/js/theme.js';
+      import { applySound } from '/js/sound.js';
+
+      const themeSel = document.getElementById('set-theme');
+      const soundChk = document.getElementById('set-sound');
+
+      themeSel.value = localStorage.getItem('ttt:theme') || 'device';
+      soundChk.checked = localStorage.getItem('ttt:sound') !== 'off';
+
+      themeSel.addEventListener('change', () => applyTheme(themeSel.value));
+      soundChk.addEventListener('change', () => applySound(soundChk.checked ? 'on' : 'off'));
+
+      document.getElementById('btn-reset-settings').addEventListener('click', () => {
+        applyTheme('device');
+        applySound('on');
+        themeSel.value = 'device';
+        soundChk.checked = true;
+      });
+    </script>
+}

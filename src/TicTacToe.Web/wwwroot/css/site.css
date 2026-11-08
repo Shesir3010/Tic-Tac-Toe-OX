@@ -1,40 +1,74 @@
+:root {
+  --ttt-bg: #020617;
+  --ttt-surface: #0f172a;
+  --ttt-surface-raised: #1e293b;
+  --ttt-border-subtle: #1e293b;
+  --ttt-border-strong: #334155;
+  --ttt-text-primary: #f1f5f9;
+  --ttt-text-secondary: #cbd5e1;
+  --ttt-text-muted: #94a3b8;
+  --ttt-text-disabled: #64748b;
+  --ttt-primary: #6366f1;
+  --ttt-primary-hover: #818cf8;
+  --ttt-mark-x: #38bdf8;
+  --ttt-mark-o: #fb7185;
+  --ttt-success: #10b981;
+  --ttt-danger: #ef4444;
+  --ttt-danger-text: #f87171;
+  --ttt-status-playing: #fbbf24;
+  --ttt-font-sans: "Inter", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ttt-font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --ttt-radius-card: 1rem;
+  --ttt-radius-control: 0.75rem;
+  --ttt-radius-pill: 9999px;
+  --ttt-shadow-card: 0 1px 2px rgb(2 6 23 / .5), 0 8px 24px -8px rgb(2 6 23 / .6);
+  --ttt-shadow-overlay: 0 12px 40px -8px rgb(2 6 23 / .8);
+  --ttt-shadow-glow-primary: 0 0 20px rgb(99 102 241 / .4);
+  --ttt-shadow-glow-x: 0 0 16px rgb(56 189 248 / .35);
+  --ttt-shadow-glow-o: 0 0 16px rgb(251 113 133 / .35);
+  --ttt-duration-fast: 150ms;
+  --ttt-duration-normal: 200ms;
+  --ttt-duration-slow: 300ms;
+  --ttt-duration-deliberate: 500ms;
+  --ttt-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ttt-ease-in-out: cubic-bezier(.4, 0, .2, 1);
+  --ttt-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
 html {
   font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+  html { font-size: 16px; }
 }
 
 body {
-  margin-bottom: 60px;
+  background-color: var(--ttt-bg);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgb(99 102 241 / .08), transparent);
+  background-attachment: fixed;
+  color: var(--ttt-text-secondary);
+  font-family: var(--ttt-font-sans);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+html { position: relative; min-height: 100%; }
+body { margin-bottom: 60px; }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 .1rem white, 0 0 0 .25rem #258cfb;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder { color: var(--bs-secondary-color); text-align: end; }
+
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder { text-align: start; }
 
 /* Tic Tac Toe board (M3 local pass-and-play) */
 .ttt-game { max-width: 560px; margin: 2rem auto; text-align: center; }
 .ttt-scoreboard { display: flex; justify-content: space-between; gap: 1rem; font-size: 1.125rem; }
 .ttt-status { font-size: 1.5rem; margin: 1rem 0; }
-.ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; position: relative; }
 .ttt-cell { aspect-ratio: 1; min-height: 64px; font-size: 2.5rem; font-weight: 700; border: 1px solid #dee2e6; border-radius: .5rem; background: #fff; }
 .ttt-cell:hover { background: #f8f9fa; }
 .ttt-cell:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
@@ -42,3 +76,56 @@ body {
 .ttt-mark-o { color: #dc2626; }
 .ttt-winning { background: #d1e7dd; box-shadow: inset 0 0 0 3px #10b981; }
 .ttt-actions { margin-top: 1rem; display: flex; gap: .5rem; justify-content: center; }
+
+/* M7.5 design tokens + components (justify: ux-ui-design-system.md §2) */
+:root { --ttt-sans: var(--ttt-font-sans); }
+
+ttt-card, .ttt-card {
+  background: var(--ttt-surface);
+  color: var(--ttt-text-secondary);
+  border: 1px solid var(--ttt-border-subtle);
+  border-radius: var(--ttt-radius-card);
+  padding: 24px;
+  box-shadow: var(--ttt-shadow-card);
+}
+
+.ttt-scoreboard span { color: var(--ttt-text-secondary); }
+.ttt-scoreboard strong { color: var(--ttt-text-primary); font-family: var(--ttt-font-mono); }
+
+.ttt-status { color: var(--ttt-text-primary); font-weight: 600; }
+
+.ttt-board { background: var(--ttt-surface); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }
+.ttt-cell {
+  background: var(--ttt-surface-raised);
+  border: 1px solid var(--ttt-border-strong);
+  border-radius: var(--ttt-radius-control);
+  color: var(--ttt-text-primary);
+  min-height: 64px;
+  transition: transform var(--ttt-duration-fast) var(--ttt-ease-out), background var(--ttt-duration-fast);
+}
+.ttt-cell:hover:not(:disabled) { background: #334155; }
+.ttt-cell:focus-visible { outline: 2px solid var(--ttt-primary-hover); outline-offset: 2px; }
+.ttt-cell:active:not(:disabled) { transform: scale(.97); }
+.ttt-mark-x { color: var(--ttt-mark-x); text-shadow: var(--ttt-shadow-glow-x); }
+.ttt-mark-o { color: var(--ttt-mark-o); text-shadow: var(--ttt-shadow-glow-o); }
+.ttt-winning { background: rgb(16 185 129 / .18); box-shadow: inset 0 0 0 3px var(--ttt-success), var(--ttt-shadow-glow-x); }
+
+.ttt-win-line {
+  position: absolute; left: 0; right: 0; top: 0; height: 4px; margin: auto;
+  border-radius: 999px; background: var(--ttt-success);
+  transition: transform var(--ttt-duration-deliberate) var(--ttt-ease-out);
+  pointer-events: none;
+}
+
+.ttt-controls label { display: inline-flex; flex-direction: column; gap: 4px; margin-right: 12px; text-align: left; }
+
+.ttt-toast {
+  position: fixed; right: 16px; bottom: 16px; z-index: 1050;
+  background: var(--ttt-surface); color: var(--ttt-text-primary);
+  border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card);
+  box-shadow: var(--ttt-shadow-overlay); padding: 12px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ttt-cell, .ttt-winning, .ttt-win-line { transition: none; }
+}

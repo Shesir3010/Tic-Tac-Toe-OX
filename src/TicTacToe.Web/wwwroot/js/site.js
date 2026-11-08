@@ -1,4 +1,8 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿import { applyTheme, toggleTheme } from './theme.js';
+import { applySound, sounds, toggleSound } from './sound.js';
 
-// Write your JavaScript code.
+applyTheme();
+applySound(localStorage.getItem('ttt:sound') || 'on');
+
+document.getElementById('nav-theme')?.addEventListener('click', () => { toggleTheme(); sounds.toggle(); });
+document.getElementById('nav-sound')?.addEventListener('click', () => { toggleSound(); sounds.toggle(); });

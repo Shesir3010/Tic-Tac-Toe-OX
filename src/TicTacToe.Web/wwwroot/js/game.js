@@ -1,4 +1,6 @@
 // Tic Tac Toe board — render-only. Server is referee; state is replaced wholesale (never merged).
+import { sounds } from './sound.js';
+
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
 const errorEl = document.getElementById('error');
@@ -9,6 +11,16 @@ const modeEl = document.getElementById('mode');
 const difficultyEl = document.getElementById('difficulty');
 const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
 const authenticated = document.querySelector('meta[name="ttt:authenticated"]')?.content === 'true';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!document.getElementById('win-line')) {
+  const overlay = document.createElement('div');
+  overlay.id = 'win-line';
+  overlay.className = 'ttt-win-line';
+  overlay.hidden = true;
+  overlay.setAttribute('aria-hidden', 'true');
+  boardEl.appendChild(overlay);
+}
 
 let cells = Array(9).fill(null);
 let turn = 0;
@@ -37,6 +49,23 @@ function statusText(result) {
   return turn === 0 ? "X's turn" : "O's turn";
 }
 
+function drawWinLine(line) {
+  const overlay = document.getElementById('win-line');
+  if (!overlay) return;
+  if (!line || line.length !== 3 || reducedMotion) { overlay.hidden = true; return; }
+  const [a, b, c] = line;
+  const ax = (a % 3) * 33.333, ay = Math.floor(a / 3) * 33.333;
+  const cx = (c % 3) * 33.333, cy = Math.floor(c / 3) * 33.333;
+  const mx = (ax + cx) / 2 + 16.6, my = (ay + cy) / 2 + 16.6;
+  const len = Math.hypot(cx - ax, cy - ay);
+  const angle = Math.atan2(cy - ay, cx - ax) * 180 / Math.PI;
+  overlay.hidden = false;
+  overlay.style.width = `${len}%`;
+  overlay.style.left = `${mx - len / 2}%`;
+  overlay.style.top = `${my}%`;
+  overlay.style.transform = `rotate(${angle}deg)`;
+}
+
 function render(result) {
   const btns = boardEl.querySelectorAll('.ttt-cell');
   btns.forEach((btn, idx) => {
@@ -50,6 +79,9 @@ function render(result) {
   });
   if (result && result.winningLine) {
     result.winningLine.forEach(i => btns[i].classList.add('ttt-winning'));
+    drawWinLine(result.winningLine);
+  } else {
+    drawWinLine(null);
   }
   statusEl.textContent = statusText(result);
   renderScore();
@@ -77,6 +109,23 @@ modeEl.addEventListener('change', () => {
   resetBoard(false);
 });
 difficultyEl.addEventListener('change', () => resetBoard(false));
+
+function moveFocus(e, idx) {
+  const r = Math.floor(idx / 3), c = idx % 3;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); focusCell(r * 3 + Math.max(0, c - 1)); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); focusCell(r * 3 + Math.min(2, c + 1)); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); focusCell(Math.max(0, r - 1) * 3 + c); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); focusCell(Math.min(2, r + 1) * 3 + c); }
+}
+
+function focusCell(idx) {
+  boardEl.querySelectorAll('.ttt-cell')[idx]?.focus();
+}
+
+boardEl.addEventListener('keydown', (e) => {
+  const btn = e.target.closest('.ttt-cell');
+  if (btn) moveFocus(e, Number(btn.dataset.index));
+});
 
 boardEl.addEventListener('click', async (e) => {
   const btn = e.target.closest('.ttt-cell');
@@ -121,15 +170,18 @@ boardEl.addEventListener('click', async (e) => {
   turn = data.turn === null || data.turn === undefined ? -1 : data.turn;
   finished = data.result && data.result.outcome !== 0;
 
+  sounds.place();
+
   if (finished) {
     if (data.result.outcome === 1) score.x++;
     else if (data.result.outcome === 2) score.o++;
     else if (data.result.outcome === 3) score.draws++;
     saveScore();
+    if (data.result.outcome === 1) sounds.win();
+    else if (data.result.outcome === 2) sounds.lose();
+    else sounds.draw();
 
     if (authenticated && !res.redirected) {
-      // SaveMatch (Razor POST): server replays Moves and compares claimed result.
-      // Symbol is X (human always X in local/computer v1); claimed maps from server outcome.
       const claimed = data.result.outcome === 3 ? 2 : (data.result.outcome === 1 ? 0 : 1);
       const fd = new FormData();
       fd.append('moves', moves.join(','));
