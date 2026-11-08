@@ -96,11 +96,13 @@
 
 ## M7 — Accounts
 
-- [ ] Register (unique username + email, inline duplicate errors)
-- [ ] Login (username-or-email; **one generic error** for unknown user or wrong password)
-- [ ] Logout (`[Authorize]` on all user surfaces incl. the hub)
-- [ ] Lockout after 5 failures → `Auth.LockedOut`
-- [ ] W-8 passed
+- [x] Register (unique username + email, inline duplicate errors)
+- [x] Login (username-or-email; **one generic error** for unknown user or wrong password)
+- [x] Logout (`[Authorize]` on all user surfaces incl. the hub)
+- [x] Lockout after 5 failures → `Auth.LockedOut`
+- [x] W-8 passed
+
+**Evidence (M7 closed 2026-11-08):** `29af8c2` + `10f6fb5` — AccountController + IAccountService (UserManager/SignInManager, lockout 5/5min) · live Register m7test 302→History, Login 302→History, Logout 302→/ (form tag-helper token fix) · throwaway lockme 1-4 INVALID → 5-6 LOCKED, `walkthroughs/W-M7-2026-11-08.md`.
 
 ## M7.5 — Theme, sound & settings (polish)
 
