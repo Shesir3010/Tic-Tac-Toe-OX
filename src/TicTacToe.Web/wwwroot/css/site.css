@@ -163,7 +163,7 @@ ttt-card, .ttt-card {
   position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; overflow: visible; z-index: 2;
 }
-.ttt-win-line line { stroke: var(--ttt-success); stroke-width: 6; stroke-linecap: round; }
+.ttt-win-line line { stroke: var(--ttt-success); stroke-width: .8; stroke-linecap: round; }
 
 .ttt-controls label { display: inline-flex; flex-direction: column; gap: 4px; margin-right: 12px; text-align: left; }
 
