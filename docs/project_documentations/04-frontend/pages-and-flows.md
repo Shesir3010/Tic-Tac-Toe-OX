@@ -91,7 +91,7 @@ Routing is server-side (MVC controllers) — there is no SPA router; the hub is 
 | Password input | Eye toggle (show/hide); empty submit shows "Password is required." |
 | Remember me | Checkbox, custom styled, label always adjacent (never placeholder-only labels) |
 | Sign in | Primary, full width, spinner while submitting (label "Signing in…"); on failure the password clears, username stays |
-| Lockout state | After 5 failed attempts: locked message + disabled button for 5 minutes, countdown in `text-mono` |
+| Lockout state | After 5 failed attempts: locked message + disabled button for 1 minute, countdown in `text-mono` |
 
 ---
 

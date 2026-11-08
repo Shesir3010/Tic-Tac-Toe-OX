@@ -14,7 +14,7 @@
 2. **Tests mirror `Features/`** with `MethodName_Scenario_ExpectedResult` names and AAA structure; the engine suite is exhaustive (E1–E6, all 8 win lines, Hard minimax at-least-draw) with a 100% coverage gate, never weakened to make a run pass.
 3. **Expected failures are `OperationResult` codes** — tests assert codes, never exceptions, except for unexpected-failure paths (crashes, DB down).
 4. **The manual layer is real:** walkthrough scripts W-1…W-13 (two browsers, cookie flows, hub negotiate, races) run at every milestone gate and the M13 sweep; **walkthrough evidence is recorded in `docs/project_documentations/walkthroughs/` — unrecorded = not passed**.
-5. **Security is checklist-verified:** PBKDF2, lockout (5/5 min), HttpOnly cookie, anti-forgery, EF parameterization, Razor output encoding, anti-IDOR participant checks, server-computed hub groups, headers (§security §3–§4 + §8).
+5. **Security is checklist-verified:** PBKDF2, lockout (5/1 min), HttpOnly cookie, anti-forgery, EF parameterization, Razor output encoding, anti-IDOR participant checks, server-computed hub groups, headers (§security §3–§4 + §8).
 6. **Logs are a PII surface:** never log passwords, cookies, connection strings, or full emails; masked identifiers + correlation ids only.
 
 ## Milestones you join

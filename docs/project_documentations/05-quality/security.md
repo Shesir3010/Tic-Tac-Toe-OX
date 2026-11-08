@@ -56,7 +56,7 @@ Boundary rules: nothing outside T2 speaks plaintext or reaches the database; the
 | # | Category | Threat | Vector | Affected component | Mitigation |
 | --- | --- | --- | --- | --- | --- |
 | S1 | Spoofing | Session-cookie theft via XSS | Malicious script reads non-HttpOnly cookie | App | Cookie is **`HttpOnly`** — JavaScript cannot read it (the structural fix the cookie design gives over token-in-storage designs) |
-| S2 | Spoofing | Credential stuffing / brute force | Automated login attempts | Login | Lockout 5 attempts / 5 min (§3.1); PBKDF2 hashing |
+| S2 | Spoofing | Credential stuffing / brute force | Automated login attempts | Login | Lockout 5 attempts / 1 min (§3.1); PBKDF2 hashing |
 | T1 | Tampering | Illegal or crafted moves from a modified client | Custom client bypassing the UI | Moves (hub/JSON) | Server-authoritative engine guards: participant + turn + bounds + occupancy + status (§3.7) |
 | T2 | Tampering | SQL injection | Crafted username/email/position fields | App, SQL Server | EF Core parameterized queries only; validator allowlists (§3.6) |
 | T3 | Tampering | Double-move race | Two move requests simultaneously | Room store | Per-room lock (ADR-0013) + re-validation inside the lock; loser gets `Game.NotYourTurn`/`CellOccupied` |
@@ -80,7 +80,7 @@ Boundary rules: nothing outside T2 speaks plaintext or reaches the database; the
 | Password hashing | ASP.NET Core Identity `PasswordHasher` — PBKDF2 (HMAC-SHA-256), framework-default iteration count (≥ 100 000), per-password salt |
 | Password policy | Minimum 8 characters, at least one upper-case, one lower-case, one digit |
 | Uniqueness | Username unique (3–20 chars, `^[A-Za-z0-9_]{3,20}$`) — **this is the display name** (no separate `DisplayName` column, owner decision 2026-11-08); email unique and valid, max 256 chars |
-| Lockout | 5 failed attempts → locked 5 minutes (`LockoutEnabled`, `MaxFailedAccessAttempts = 5`, `LockoutTimeSpan = 5 min`); locked logins show `Auth.LockedOut` |
+| Lockout | 5 failed attempts → locked 1 minute (`LockoutEnabled`, `MaxFailedAccessAttempts = 5`, `LockoutTimeSpan = 5 min`); locked logins show `Auth.LockedOut` |
 | Passwords in transit | Only over HTTPS bodies; never in URLs, never logged |
 
 ### 3.2 Session and logout
@@ -135,7 +135,7 @@ Boundary rules: nothing outside T2 speaks plaintext or reaches the database; the
 
 | Policy | Trigger | Control |
 | --- | --- | --- |
-| Login flood | Automated attempts | Identity lockout (5 / 5 min) throttles targeted accounts |
+| Login flood | Automated attempts | Identity lockout (5 / 1 min) throttles targeted accounts |
 | Move spam | Click automation | Failing moves cost a validation read; no write occurs (`Game.NotYourTurn`) |
 | Hub connections | Many concurrent connections | Free plan handles the budget target (≥ 200 concurrent authenticated, [realtime-signalr](../01-architecture/realtime-signalr.md) §8); presence counting is per user |
 | Request body | Global | Razor model binding defaults; JSON endpoint body limit is the framework default (payloads are tiny) |
@@ -204,7 +204,7 @@ CSP note: `script-src 'self'` is feasible because all JavaScript lives in `wwwro
 | A04 Insecure Design | Server-authoritative engine rules; lock-based race safety; lockout on login (§3.1, §3.6) |
 | A05 Security Misconfiguration | Same-origin only (no CORS surface); security headers middleware; environment-specific config; secrets out of the repo (§3.4, §3.8, §3.9) |
 | A06 Vulnerable and Outdated Components | Central pinning; ADR-gated package adds (§5) |
-| A07 Identification and Authentication Failures | Identity lockout 5/5 min; generic login errors; strong password policy; HttpOnly session cookie (§3.1, §3.2) |
+| A07 Identification and Authentication Failures | Identity lockout 5/1 min; generic login errors; strong password policy; HttpOnly session cookie (§3.1, §3.2) |
 | A08 Software and Data Integrity Failures | Cookie scheme only (no token crypto to break); server-side game-state transitions only |
 | A09 Logging and Monitoring Failures | Structured Serilog logs with correlation IDs; redaction policy prevents the logs themselves becoming a leak (§3.10) |
 | A10 SSRF | No endpoint fetches user-supplied URLs; the app performs no outbound HTTP calls in MVP — attack surface absent by design |
@@ -224,7 +224,7 @@ Run at every release; every item must pass:
 | # | Check | Verification |
 | --- | --- | --- |
 | 1 | Only `/Account/Login`, `/Account/Register`, `/Account/AccessDenied`, `/Error` are anonymous | Manual sweep of controller actions + unauthorized-request walkthrough (test-plan §walkthrough) |
-| 2 | Lockout: 5 failed logins → locked message for 5 min | Manual walkthrough (login x5 wrong) |
+| 2 | Lockout: 5 failed logins → locked message for 1 min | Manual walkthrough (login x5 wrong) |
 | 3 | Cookie flags: `HttpOnly`, `Secure` (prod), `Lax` | Browser DevTools cookie inspection on production deploy |
 | 4 | Security headers on all responses (CSP, nosniff, DENY, Referrer-Policy, Permissions-Policy, HSTS) | `curl -I` checklist against production |
 | 5 | HTTPS enforced; HTTP redirects; no mixed content | Browser devtools + redirect check |
@@ -238,5 +238,5 @@ Run at every release; every item must pass:
 
 - TLS is terminated at the host (Let's Encrypt); traffic inside the single-node deploy is plaintext and private — the documented MVP boundary.
 - The CSP `style-src 'unsafe-inline'` exists because Bootstrap injects styles at runtime; scripts stay strictly `'self'` (no inline scripts in views — all JS lives in `wwwroot/js/`).
-- The 14-day sliding cookie lifetime and lockout (5/5 min) are Identity defaults — changing them is an ADR + config edit, recorded in `settings-and-configuration.md`.
+- The 14-day sliding cookie lifetime and lockout (5/1 min) are Identity defaults — changing them is an ADR + config edit, recorded in `settings-and-configuration.md`.
 - Single instance by construction: presence, rooms and invitations are in memory; multi-instance deployment is explicitly out of scope until Redis lands.

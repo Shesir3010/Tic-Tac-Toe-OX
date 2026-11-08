@@ -49,7 +49,7 @@ public static class DependencyInjection
             options.Password.RequireLowercase = true;
             options.Password.RequireDigit = true;
             options.Password.RequireNonAlphanumeric = false;
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
             options.Lockout.MaxFailedAccessAttempts = 5;
             options.Lockout.AllowedForNewUsers = true;
             options.SignIn.RequireConfirmedAccount = false;

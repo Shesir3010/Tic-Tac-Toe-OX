@@ -34,7 +34,7 @@ Parent document: [PRD](../00-product/PRD.md) · Related: [System architecture](.
 | --- | --- | --- |
 | Scheme | `IdentityConstants.ApplicationScheme` (cookies, **no JWT**) | The same cookie authorizes pages **and** the hub |
 | Lifetime | 14 days, sliding | Standard Identity expiration |
-| Lockout | 5 failed attempts → 5 min lockout | Defaults; changing them is an ADR + this file |
+| Lockout | 5 failed attempts → **1 min** lockout (owner 2026-11-08, was 5 min) | Settings in `AddInfrastructure` + this file |
 | Password rules | Identity defaults (≥ 8 chars, complexity) | Displayed per-field on register (`Validation.Error`) |
 | Cookie flags | `HttpOnly` always; `Secure` in Production (host/TLS terminates at the edge) | Cookie is the only token — it must be protected |
 | `SameSite` | `Lax` | Top-level GETs carry it; no cross-site embedding exists in v1 |

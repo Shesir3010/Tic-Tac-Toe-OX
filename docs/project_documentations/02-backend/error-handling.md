@@ -47,7 +47,7 @@ Expected failures are **values** (`OperationResult<T>.Failure(code)`), not excep
 | Code | Message | Where it renders |
 | --- | --- | --- |
 | `Auth.InvalidCredentials` | "Invalid username or password." | Login form (one generic message — never "email not found") |
-| `Auth.LockedOut` | "Too many failed attempts. Try again later." | Login form after 5 failed attempts in 5 minutes |
+| `Auth.LockedOut` | "Too many failed attempts. Try again later." | Login form after 5 failed attempts in **1 minute** |
 | `Auth.DuplicateEmail` / `Auth.DuplicateUsername` | "That email / username is already taken." | Registration form, per-field inline |
 | `Auth.WrongPassword` | "Current password is incorrect." | Change-password form |
 | `Validation.Error` | Per-field message (e.g. "Password must be 8+ characters.") | The failing form field, inline |
@@ -85,4 +85,4 @@ Unexpected errors (DB connection lost, null contract violation, commit failure) 
 - Copy edits happen **only in this file** — a wording change is reviewable here and nowhere else.
 - Codes asserted verbatim in tests; message copy can change without breaking the suite.
 - Adding a code means: this file → the constants → the catalog tests, in the same change.
-- `Auth` lockout (5 attempts / 5 minutes) is the Identity default — changing it is a config decision recorded in `settings-and-configuration.md`.
+- `Auth` lockout (5 attempts / **1 minute**, owner 2026-11-08) is configured in `AddInfrastructure` — changing it is a config decision recorded in `settings-and-configuration.md`.
