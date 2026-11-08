@@ -1,16 +1,19 @@
-// Tic Tac Toe local board — render-only. Server is referee; state is replaced wholesale (never merged).
+// Tic Tac Toe board — render-only. Server is referee; state is replaced wholesale (never merged).
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
 const errorEl = document.getElementById('error');
 const scoreXEl = document.getElementById('score-x');
 const scoreDrawsEl = document.getElementById('score-draws');
 const scoreOEl = document.getElementById('score-o');
+const modeEl = document.getElementById('mode');
+const difficultyEl = document.getElementById('difficulty');
 const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
 
 let cells = Array(9).fill(null);
 let turn = 0;
 let finished = false;
 let busy = false;
+let thinking = false;
 let score = JSON.parse(localStorage.getItem('ttt:session-score') || '{"x":0,"draws":0,"o":0}');
 
 function saveScore() {
@@ -24,6 +27,7 @@ function renderScore() {
 }
 
 function statusText(result) {
+  if (thinking) return 'Computer is thinking…';
   if (!result) return turn === 0 ? "X's turn" : "O's turn";
   if (result.outcome === 1) return 'X wins!';
   if (result.outcome === 2) return 'O wins!';
@@ -53,6 +57,7 @@ function resetBoard(newMatch) {
   cells = Array(9).fill(null);
   turn = 0;
   finished = false;
+  thinking = false;
   errorEl.hidden = true;
   if (newMatch) {
     score = { x: 0, draws: 0, o: 0 };
@@ -64,6 +69,12 @@ function resetBoard(newMatch) {
 document.getElementById('btn-reset').addEventListener('click', () => resetBoard(false));
 document.getElementById('btn-new-match').addEventListener('click', () => resetBoard(true));
 
+modeEl.addEventListener('change', () => {
+  difficultyEl.disabled = modeEl.value !== '1';
+  resetBoard(false);
+});
+difficultyEl.addEventListener('change', () => resetBoard(false));
+
 boardEl.addEventListener('click', async (e) => {
   const btn = e.target.closest('.ttt-cell');
   if (!btn || busy || finished) return;
@@ -71,6 +82,7 @@ boardEl.addEventListener('click', async (e) => {
   if (cells[index] !== null) return;
 
   busy = true;
+  thinking = modeEl.value === '1';
   errorEl.hidden = true;
   render(null);
 
@@ -80,10 +92,17 @@ boardEl.addEventListener('click', async (e) => {
       'Content-Type': 'application/json',
       'RequestVerificationToken': tokenEl ? tokenEl.value : '',
     },
-    body: JSON.stringify({ cells, moveIndex: index, mark: turn }),
+    body: JSON.stringify({
+      cells,
+      moveIndex: index,
+      mark: 0,
+      mode: Number(modeEl.value),
+      difficulty: modeEl.value === '1' ? Number(difficultyEl.value) : null,
+    }),
   });
 
   busy = false;
+  thinking = false;
   const data = await res.json();
 
   if (!res.ok) {
@@ -107,4 +126,5 @@ boardEl.addEventListener('click', async (e) => {
   render(data.result);
 });
 
+difficultyEl.disabled = modeEl.value !== '1';
 render(null);

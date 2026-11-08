@@ -1,20 +1,26 @@
 using Cortex.Mediator.Commands;
 using TicTacToe.Application.Common.Results;
+using TicTacToe.Application.Contracts.Services;
 using TicTacToe.Domain.DTOs.Game;
 using TicTacToe.Domain.Engine;
+using TicTacToe.Domain.Enums;
 
 namespace TicTacToe.Application.Features.Game.Moves.Command;
 
 public sealed class PlayMoveCommandHandler : ICommandHandler<PlayMoveCommand, OperationResult<GameDto>>
 {
-    public Task<OperationResult<GameDto>> Handle(PlayMoveCommand command, CancellationToken cancellationToken)
+    private readonly IComputerPlayerFactory _factory;
+
+    public PlayMoveCommandHandler(IComputerPlayerFactory factory) => _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+
+    public async Task<OperationResult<GameDto>> Handle(PlayMoveCommand command, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command);
 
         if (command.Cells is null || command.Cells.Length != 9)
         {
-            return Task.FromResult(OperationResult<GameDto>.Failure(
-                GameErrors.Validation("Board must have 9 cells.")));
+            return OperationResult<GameDto>.Failure(
+                GameErrors.Validation("Board must have 9 cells."));
         }
 
         var board = new Board(command.Cells);
@@ -25,21 +31,42 @@ public sealed class PlayMoveCommandHandler : ICommandHandler<PlayMoveCommand, Op
         var oCount = board.Cells.Count(c => c == Player.O);
         if (xCount < oCount || xCount > oCount + 1)
         {
-            return Task.FromResult(OperationResult<GameDto>.Failure(GameErrors.NotYourTurn));
+            return OperationResult<GameDto>.Failure(GameErrors.NotYourTurn);
         }
 
         var validation = Rules.ValidateMove(board, command.MoveIndex, command.Mark, turn);
         if (!validation.IsValid)
         {
-            return Task.FromResult(OperationResult<GameDto>.Failure(ToError(validation.Failure)));
+            return OperationResult<GameDto>.Failure(ToError(validation.Failure));
         }
 
         var next = Rules.ApplyMove(board, command.MoveIndex, command.Mark);
         var result = Rules.Evaluate(next);
-        var nextTurn = result.IsFinished ? (Player?)null : (command.Mark == Player.X ? Player.O : Player.X);
+        int? computerMoveIndex = null;
 
-        var dto = new GameDto(next.Cells.ToArray(), nextTurn, result);
-        return Task.FromResult(OperationResult<GameDto>.Success(dto));
+        if (command.Mode == GameMode.Computer && !result.IsFinished)
+        {
+            // FR-10: deliberate 300-500ms thinking delay (board is non-interactive meanwhile via client busy).
+            // 300ms keeps total under the 500ms budget with minimax (~150ms worst case).
+            await Task.Delay(300, cancellationToken);
+
+            var difficulty = command.Difficulty ?? Difficulty.Medium;
+            var computerMark = command.Mark == Player.X ? Player.O : Player.X;
+            var computer = _factory.Create(difficulty, computerMark);
+            var computerMove = computer.ChooseMove(next);
+            next = Rules.ApplyMove(next, computerMove, computerMark);
+            computerMoveIndex = computerMove;
+            result = Rules.Evaluate(next);
+        }
+
+        var nextTurn = result.IsFinished
+            ? (Player?)null
+            : command.Mode == GameMode.Computer
+                ? command.Mark
+                : (command.Mark == Player.X ? Player.O : Player.X);
+
+        var dto = new GameDto(next.Cells.ToArray(), nextTurn, result, computerMoveIndex);
+        return OperationResult<GameDto>.Success(dto);
     }
 
     private static OperationError ToError(EngineFailure? failure) => failure switch

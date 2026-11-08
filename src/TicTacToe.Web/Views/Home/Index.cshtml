@@ -4,6 +4,24 @@
 }
 
 <div class="ttt-game">
+    <div class="ttt-controls">
+        <label>
+            Mode
+            <select id="mode" aria-label="Game mode">
+                <option value="0">Local pass-and-play</option>
+                <option value="1">Vs computer</option>
+            </select>
+        </label>
+        <label>
+            Difficulty
+            <select id="difficulty" aria-label="Computer difficulty">
+                <option value="0">Easy</option>
+                <option value="1" selected>Medium</option>
+                <option value="2">Hard</option>
+            </select>
+        </label>
+    </div>
+
     <div class="ttt-scoreboard" aria-live="polite">
         <span>X <strong id="score-x">0</strong></span>
         <span>Draws <strong id="score-draws">0</strong></span>

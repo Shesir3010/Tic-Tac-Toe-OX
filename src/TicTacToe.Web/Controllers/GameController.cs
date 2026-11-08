@@ -14,7 +14,8 @@ public class GameController(IMediator mediator) : ControllerBase
     [HttpPost("move")]
     public async Task<IActionResult> Move([FromBody] MoveRequest request, CancellationToken cancellationToken)
     {
-        var command = new PlayMoveCommand(request.Cells, request.MoveIndex, request.Mark);
+        var command = new PlayMoveCommand(
+            request.Cells, request.MoveIndex, request.Mark, request.Mode, request.Difficulty);
         var result = await mediator.SendAsync(command, cancellationToken);
         if (!result.IsSuccess)
         {
