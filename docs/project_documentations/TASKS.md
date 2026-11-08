@@ -124,9 +124,11 @@
 
 ## M8 — Guests
 
-- [ ] Guest plays local/computer (browser only)
-- [ ] Nothing a guest does touches the database
-- [ ] Guest notice shown in UI (session score only)
+- [x] Guest plays local/computer (browser only)
+- [x] Nothing a guest does touches the database
+- [x] Guest notice shown in UI (session score only)
+
+**Evidence (M8 closed 2026-11-08):** `da1fe73` — dismissible alert “Playing as guest — results are stored only in this session.” only when anonymous · `Matches/Save` + `History` are `[Authorize]` (guest writes blocked) · GameController has no DB · score in `localStorage` only · build 0/0, tests 107/107, live `GET /` 200 hasGuestNotice True.
 
 ## M9 — Presence
 
