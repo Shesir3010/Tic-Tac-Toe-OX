@@ -58,8 +58,14 @@ function drawWinLine(line) {
   if (!overlay) return;
   if (!line || line.length !== 3 || reducedMotion) { overlay.hidden = true; overlay.innerHTML = ''; return; }
   const [a, , c] = line;
-  const ax = (a % 3) * 33.333 + 16.667, ay = Math.floor(a / 3) * 33.333 + 16.667;
-  const cx = (c % 3) * 33.333 + 16.667, cy = Math.floor(c / 3) * 33.333 + 16.667;
+  const btns = boardEl.querySelectorAll('.ttt-cell');
+  const boardRect = boardEl.getBoundingClientRect();
+  const aRect = btns[a].getBoundingClientRect();
+  const cRect = btns[c].getBoundingClientRect();
+  const ax = ((aRect.left - boardRect.left) + aRect.width / 2) / boardRect.width * 100;
+  const ay = ((aRect.top - boardRect.top) + aRect.height / 2) / boardRect.height * 100;
+  const cx = ((cRect.left - boardRect.left) + cRect.width / 2) / boardRect.width * 100;
+  const cy = ((cRect.top - boardRect.top) + cRect.height / 2) / boardRect.height * 100;
   overlay.innerHTML = `<line x1="${ax}%" y1="${ay}%" x2="${cx}%" y2="${cy}%"></line>`;
   overlay.hidden = false;
 }
