@@ -46,7 +46,17 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         var result = await mediator.SendAsync(new SendInvitationCommand(targetUserId));
         if (result.IsSuccess && result.Value is not null)
         {
-            await Clients.All.SendAsync("InvitationReceived", new { invitationId = result.Value.InvitationId.ToString(), fromUserId = result.Value.FromUserId.ToString(), fromName = Context.User?.Identity?.Name, expiresInSeconds = 30 });
+            // Target ONLY (per-user), never All — otherwise the inviter sees their own popup.
+            await Clients.User(targetUserId.ToString()).SendAsync(
+                "InvitationReceived",
+                new
+                {
+                    invitationId = result.Value.InvitationId.ToString(),
+                    fromUserId = result.Value.FromUserId.ToString(),
+                    toUserId = result.Value.ToUserId.ToString(),
+                    fromName = Context.User?.Identity?.Name,
+                    expiresInSeconds = 30,
+                });
         }
         return result;
     }
