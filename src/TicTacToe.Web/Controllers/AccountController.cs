@@ -48,7 +48,7 @@ public class AccountController(IAccountService accounts) : Controller
             return View(model);
         }
 
-        return RedirectToAction(nameof(HistoryController.Index), "History");
+        return RedirectToAction(nameof(HomeController.Index), "Home");
     }
 
     [AllowAnonymous]
@@ -72,7 +72,7 @@ public class AccountController(IAccountService accounts) : Controller
             return View(model);
         }
 
-        return RedirectToAction(nameof(HistoryController.Index), "History");
+        return RedirectToAction(nameof(HomeController.Index), "Home");
     }
 
     [HttpPost]

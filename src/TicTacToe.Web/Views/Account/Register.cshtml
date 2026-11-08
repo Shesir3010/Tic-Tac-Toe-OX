@@ -4,40 +4,57 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="ttt-game">
-    <h1>Create your account</h1>
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="ttt-auth">
+    <div class="ttt-auth-brand" aria-hidden="true">
+        <div class="ttt-auth-logo"><span class="ttt-mark-x">X</span><span class="ttt-mark-o">O</span></div>
+        <p class="ttt-auth-tag">Play a real person. Right now.</p>
+    </div>
+    <div class="ttt-card ttt-auth-card">
+        <h1>Create your account</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="mb-3">
-            <label asp-for="Username" class="form-label"></label>
-            <input asp-for="Username" class="form-control" />
-            <span asp-validation-for="Username" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" autocomplete="username" placeholder="Username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" autocomplete="email" placeholder="you@example.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="Password" class="form-label"></label>
-            <input asp-for="Password" type="password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control" id="pw" autocomplete="new-password" />
+                    <button type="button" class="btn btn-outline-secondary" data-eye="pw" aria-label="Show password">Show</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="ConfirmPassword" class="form-label"></label>
-            <input asp-for="ConfirmPassword" type="password" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
 
-        <button class="btn btn-primary w-100" type="submit">Create account</button>
-    </form>
-    <p class="mt-3">Has account? <a href="/Account/Login">Login</a></p>
+            <button class="btn btn-primary w-100 ttt-cta" type="submit">Create account</button>
+        </form>
+        <p class="ttt-auth-foot">Has account? <a href="/Account/Login">Login</a></p>
+    </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+      document.querySelectorAll('[data-eye]').forEach(b => b.addEventListener('click', () => {
+        const f = document.getElementById(b.dataset.eye);
+        const show = f.type === 'password';
+        f.type = show ? 'text' : 'password';
+        b.textContent = show ? 'Hide' : 'Show';
+      }));
+    </script>
 }

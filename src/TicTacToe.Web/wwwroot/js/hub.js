@@ -33,14 +33,24 @@ function renderOnline(players) {
     btn.className = 'btn btn-sm btn-primary';
     btn.textContent = 'Invite';
     btn.addEventListener('click', async () => {
+      // Pressed state: disable immediately so a second click can't double-invite.
+      btn.disabled = true;
+      btn.textContent = 'Waiting…';
+      btn.classList.add('is-pressed');
+      btn.setAttribute('aria-pressed', 'true');
       const res = await conn.invoke('InvitePlayer', p.userId);
       const err = res?.error;
-      if (err) alert(err.message || 'Invite failed');
-      else if (res?.value) {
+      if (err) {
+        alert(err.message || 'Invite failed');
+        btn.disabled = false;
+        btn.textContent = 'Invite';
+        btn.classList.remove('is-pressed');
+        btn.removeAttribute('aria-pressed');
+      } else if (res?.value) {
         const card = document.getElementById('waiting-card');
         card.hidden = false;
         document.getElementById('waiting-name').textContent = p.displayName;
-        document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; });
+        document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; btn.disabled = false; btn.textContent = 'Invite'; btn.classList.remove('is-pressed'); });
       }
     });
     const wrap = document.createElement('span');

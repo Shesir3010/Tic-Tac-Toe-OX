@@ -96,6 +96,25 @@ body { margin-bottom: 60px; }
 .form-floating > .form-control:focus::placeholder { text-align: start; }
 
 /* Tic Tac Toe board (M3 local pass-and-play) */
+.ttt-auth { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 960px; margin: 2rem auto; align-items: center; }
+@media (min-width: 768px) { .ttt-auth { grid-template-columns: 1.1fr 1fr; } }
+.ttt-auth-brand { text-align: center; padding: 40px 16px; }
+.ttt-auth-logo { display: flex; justify-content: center; gap: 12px; font-size: 4rem; font-weight: 800; }
+.ttt-auth-tag { color: var(--ttt-text-muted); font-size: 1.125rem; margin-top: 12px; }
+.ttt-auth-card { max-width: 448px; width: 100%; margin: 0 auto; }
+.ttt-auth-card h1 { font-size: 1.75rem; color: var(--ttt-text-primary); font-weight: 700; }
+.ttt-auth-sub { color: var(--ttt-text-muted); }
+.ttt-auth-foot { text-align: center; margin-top: 16px; color: var(--ttt-text-muted); }
+.ttt-cta { border-radius: var(--ttt-radius-pill); min-height: 48px; font-weight: 700; background: var(--ttt-primary); border: 0; box-shadow: var(--ttt-shadow-glow-primary); }
+.ttt-cta:hover, .ttt-cta:focus-visible { background: var(--ttt-primary-hover); color: #fff; }
+.ttt-card .form-control { background: var(--ttt-surface); color: var(--ttt-text-primary); border-color: var(--ttt-border-strong); }
+.ttt-card .form-control:focus { border-color: var(--ttt-primary-hover); box-shadow: 0 0 0 2px var(--ttt-primary-hover); background: var(--ttt-surface); color: var(--ttt-text-primary); }
+.btn-primary { background: var(--ttt-primary); border: 0; border-radius: var(--ttt-radius-pill); padding: .5rem 1.25rem; font-weight: 700; }
+.btn-primary:hover, .btn-primary:focus-visible { background: var(--ttt-primary-hover); color: #fff; }
+.btn { min-height: 44px; }
+.btn-outline-primary, .btn-outline-secondary { border-radius: var(--ttt-radius-pill); }
+.btn-outline-primary { border-color: var(--ttt-primary); color: var(--ttt-primary-hover); }
+.btn-outline-secondary { border-color: var(--ttt-border-strong); color: var(--ttt-text-secondary); }
 .ttt-home { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 1140px; margin: 2rem auto; align-items: start; }
 @media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(280px, 340px) minmax(0, 560px); gap: 80px; justify-content: center; } }
 .ttt-lobby { background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }

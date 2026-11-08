@@ -4,33 +4,51 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="ttt-game">
-    <h1>Welcome back</h1>
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="ttt-auth">
+    <div class="ttt-auth-brand" aria-hidden="true">
+        <div class="ttt-auth-logo"><span class="ttt-mark-x">X</span><span class="ttt-mark-o">O</span></div>
+        <p class="ttt-auth-tag">Play a real person. Right now.</p>
+    </div>
+    <div class="ttt-card ttt-auth-card">
+        <h1>Welcome back</h1>
+        <p class="ttt-auth-sub">Sign in to keep playing</p>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="mb-3">
-            <label asp-for="UsernameOrEmail" class="form-label">Username or email</label>
-            <input asp-for="UsernameOrEmail" class="form-control" />
-            <span asp-validation-for="UsernameOrEmail" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="UsernameOrEmail" class="form-label">Username or email</label>
+                <input asp-for="UsernameOrEmail" class="form-control" autocomplete="username" placeholder="Username or email" />
+                <span asp-validation-for="UsernameOrEmail" class="text-danger"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="Password" class="form-label"></label>
-            <input asp-for="Password" type="password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control" id="pw" autocomplete="current-password" />
+                    <button type="button" class="btn btn-outline-secondary" data-eye="pw" aria-label="Show password">Show</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
 
-        <div class="form-check mb-3">
-            <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
-            <label asp-for="RememberMe" class="form-check-label"></label>
-        </div>
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
 
-        <button class="btn btn-primary w-100" type="submit">Sign in</button>
-    </form>
-    <p class="mt-3">No account? <a href="/Account/Register">Register</a></p>
+            <button class="btn btn-primary w-100 ttt-cta" type="submit">Sign in</button>
+        </form>
+        <p class="ttt-auth-foot">No account? <a href="/Account/Register">Register</a></p>
+    </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+      document.querySelectorAll('[data-eye]').forEach(b => b.addEventListener('click', () => {
+        const f = document.getElementById(b.dataset.eye);
+        const show = f.type === 'password';
+        f.type = show ? 'text' : 'password';
+        b.textContent = show ? 'Hide' : 'Show';
+      }));
+    </script>
 }
