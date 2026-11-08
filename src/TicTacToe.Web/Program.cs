@@ -1,5 +1,4 @@
 using Serilog;
-using TicTacToe.Application;
 using TicTacToe.Infrastructure.Extensions;
 using TicTacToe.Web.Hubs;
 
@@ -17,9 +16,8 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddHealthChecks();
-builder.Services.AddApplication();
-// AddInfrastructure registers DbContext + Identity (cookie auth, ApplicationScheme) + TimeProvider.
-// Identity cookie is the sole credential for pages AND hub (ADR-0004); no JWT, no manual AddCookie here.
+// All DI (Cortex/Mapster + DbContext + Identity + singletons) is registered in
+// Infrastructure/Extensions/DependencyInjection.cs. Application holds only contracts/handlers.
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddAuthorization();

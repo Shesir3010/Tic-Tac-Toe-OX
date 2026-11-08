@@ -1,7 +1,11 @@
+using Cortex.Mediator;
+using Cortex.Mediator.DependencyInjection;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TicTacToe.Application;
 using TicTacToe.Infrastructure.Data;
 using TicTacToe.Infrastructure.Identity;
 
@@ -12,6 +16,12 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
+
+        // CQRS + mapping: handlers/profiles live in Application, registration (DI) lives here.
+        services.AddCortexMediator(
+            new[] { typeof(ApplicationAssemblyMarker) },
+            options => { options.AddDefaultBehaviors(); });
+        services.AddMapster();
 
         services.AddSingleton(TimeProvider.System);
 

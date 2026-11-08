@@ -57,6 +57,16 @@ public sealed class ArchitectureTests
     }
 
     [Test]
+    public void Application_HasNoDependencyInjectionReference()
+    {
+        // Pure Clean: DI registration lives in Infrastructure/Extensions only.
+        // Application must not reference Microsoft.Extensions.DependencyInjection.Abstractions.
+        System.Reflection.Assembly.Load("TicTacToe.Application").GetReferencedAssemblies()
+            .Where(a => a.Name == "Microsoft.Extensions.DependencyInjection.Abstractions")
+            .ShouldBeEmpty();
+    }
+
+    [Test]
     public void Application_HasNoSignalRReferences()
     {
         System.Reflection.Assembly.Load("TicTacToe.Application").GetReferencedAssemblies()

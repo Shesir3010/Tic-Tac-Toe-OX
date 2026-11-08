@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Cortex.Mediator" />
     <PackageReference Include="Mapster" />
-    <PackageReference Include="Mapster.DependencyInjection" />
   </ItemGroup>
 
   <PropertyGroup>
