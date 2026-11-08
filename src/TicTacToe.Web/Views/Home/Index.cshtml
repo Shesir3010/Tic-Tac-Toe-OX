@@ -4,6 +4,13 @@
 }
 
 <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
+@if (User.Identity?.IsAuthenticated != true)
+{
+    <div class="alert alert-info d-flex justify-content-between align-items-center ttt-guest-notice" role="note">
+        <span>Playing as guest — results are stored only in this session.</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
+    </div>
+}
 <div class="ttt-home">
     @if (User.Identity?.IsAuthenticated == true)
     {
@@ -38,13 +45,6 @@
     </div>
 
     <div class="ttt-game">
-        @if (User.Identity?.IsAuthenticated != true)
-        {
-            <div class="alert alert-info d-flex justify-content-between align-items-center" role="note">
-                <span>Playing as guest — results are stored only in this session.</span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
-            </div>
-        }
         <div class="ttt-panel">
             <div class="ttt-segmented" role="group" aria-label="Game mode">
                 <button type="button" id="mode-local" class="is-active" aria-pressed="true">Local</button>
