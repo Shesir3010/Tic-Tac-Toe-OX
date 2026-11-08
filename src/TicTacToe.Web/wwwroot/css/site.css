@@ -118,7 +118,7 @@ body { margin-bottom: 60px; }
 .ttt-home { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 1140px; margin: 2rem auto; align-items: start; }
 @media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(280px, 340px) minmax(0, 560px); gap: 80px; justify-content: center; } }
 .ttt-lobby { background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }
-.ttt-userbox { display: flex; align-items: center; gap: 10px; background: var(--ttt-surface); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-control); padding: 12px; margin-bottom: 12px; }
+.ttt-userbox { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 14px; box-shadow: var(--ttt-shadow-card); }
 .ttt-user-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ttt-success); font-size: .85rem; }
 .ttt-lobby-head { display: flex; align-items: center; gap: 10px; }
 .ttt-lobby-head h2 { font-size: 1.25rem; margin: 0; color: var(--ttt-text-primary); }
