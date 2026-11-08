@@ -87,10 +87,12 @@
 
 ## M6 — History & stats pages
 
-- [ ] `GetHistoryQuery` (paged, newest first) + `GetStatsQuery` (W/L/D computed, never a stored counter)
-- [ ] History page with opponent names (or "**Deleted player**")
-- [ ] Stats chips (Played / Won / Lost / Win %)
-- [ ] U-9 green
+- [x] `GetHistoryQuery` (paged, newest first) + `GetStatsQuery` (W/L/D computed, never a stored counter)
+- [x] History page with opponent names (or "**Deleted player**")
+- [x] Stats chips (Played / Won / Lost / Win %)
+- [x] U-9 green
+
+**Evidence (M6 closed, owner-confirmed 2026-11-08):** `ddaed7d` + `0f0cba0` — queries paged newest-first (EF join for opponent), History page chips/table, tests 107/107 (5 new history/stats incl. guest Validation + clamp), live Save (`{"saved":true}`) → History 200 with Win row, `walkthroughs/W-M6-2026-11-08.md`.
 
 ## M7 — Accounts
 
