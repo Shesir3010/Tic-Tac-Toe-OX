@@ -109,9 +109,11 @@ function renderOnline(players) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-sm btn-primary';
-      const isWaiting = pendingInvitationId && p.userId && !pendingInvitationId.startsWith('__');
-      btn.textContent = isWaiting ? 'Waiting…' : 'Invite';
-      if (isWaiting) { btn.disabled = true; btn.classList.add('is-pressed'); btn.setAttribute('aria-pressed', 'true'); }
+      // One outgoing at a time (FR-33): while pending, every Invite is disabled
+      // so the user can't hit Invite.AlreadyPending by accident.
+      const locked = !!pendingInvitationId;
+      btn.textContent = locked ? 'Waiting…' : 'Invite';
+      if (locked) { btn.disabled = true; btn.classList.add('is-pressed'); btn.setAttribute('aria-pressed', 'true'); }
       btn.addEventListener('click', async () => {
         btn.disabled = true;
         btn.textContent = 'Sending…';

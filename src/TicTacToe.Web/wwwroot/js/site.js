@@ -9,6 +9,7 @@ document.getElementById('nav-theme')?.addEventListener('click', () => { toggleTh
 document.getElementById('nav-sound')?.addEventListener('click', () => { toggleSound(); sounds.toggle(); });
 
 // FR-32: logged-in players hold one hub connection on every page.
-if (document.querySelector('meta[name="ttt:authenticated"]')?.content === 'true' || document.body.innerHTML.includes('id="online-list"')) {
+// Guests never start the hub (it is [Authorize]) — lobby shows guest notice only.
+if (document.querySelector('meta[name="ttt:authenticated"]')?.content === 'true') {
   startHub();
 }
