@@ -75,7 +75,8 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         var result = await mediator.SendAsync(new CancelInvitationCommand(invitationId));
         if (result.IsSuccess && inv is not null)
         {
-            await SendToBoth(inv,
+            // Canceller already updated its own UI locally; only the target needs the event (closes popup).
+            await Clients.User(inv.ToUserId.ToString()).SendAsync(
                 "InvitationCancelled",
                 new { invitationId = invitationId.ToString(), reason = "cancelled", byName = Context.User?.Identity?.Name });
         }
@@ -86,18 +87,22 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
     {
         var inv = invitations.Get(invitationId);
         var result = await mediator.SendAsync(new RespondToInvitationCommand(invitationId, accept));
-        // Broadcast only to the two participants (never All — bystanders must not see toasts/popups).
+        // Broadcast only to the participants — never All (bystanders must not see toasts/popups).
         if (inv is not null && result.IsSuccess)
         {
             if (accept && result.Value is not null)
             {
+                // Accept: both sides need the room (both show banner / will navigate in M11).
                 await SendToBoth(inv,
                     "InvitationAccepted",
                     new { invitationId = invitationId.ToString(), room = result.Value });
             }
             else if (!accept)
             {
-                await SendToBoth(inv,
+                // Reject: only the inviter is notified. The rejecter already got local feedback
+                // ("You declined…" + toast) from its own click handler — echoing Declined back
+                // to it would show the same "declined" popup to both panels.
+                await Clients.User(inv.FromUserId.ToString()).SendAsync(
                     "InvitationDeclined",
                     new { invitationId = invitationId.ToString(), byName = Context.User?.Identity?.Name });
             }

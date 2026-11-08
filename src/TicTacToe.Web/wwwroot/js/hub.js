@@ -234,8 +234,10 @@ conn.on('InvitationAccepted', (p) => {
   toast('Invitation accepted! Room created.', 'success');
 });
 conn.on('InvitationCancelled', (p) => {
+  // Manual Cancel is sent only to the target (canceller already updated locally);
+  // offline-cancel is sent to the counterpart. Either way: close popup, clear Waiting, red banner.
   if (p?.invitationId && popupInvitationId === p.invitationId) hidePopup();
-  if (p?.invitationId && pendingInvitationId === p.invitationId) hideWaitingCard(); else if (!popupInvitationId) hideWaitingCard();
+  hideWaitingCard();
   const msg = p?.reason === 'offline' ? 'The other player went offline. Invitation cancelled.' : 'Invitation cancelled.';
   showInviteStatus(msg);
   toast(msg, 'info');
