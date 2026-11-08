@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\TicTacToe.Application\TicTacToe.Application.csproj" />
     <ProjectReference Include="..\TicTacToe.Domain\TicTacToe.Domain.csproj" />
   </ItemGroup>
@@ -13,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="Migrations/**" />
+    <AdditionalFiles Include="Data/Migrations/**" />
   </ItemGroup>
 
   <PropertyGroup>

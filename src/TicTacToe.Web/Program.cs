@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Serilog;
 using TicTacToe.Application;
 using TicTacToe.Infrastructure.Extensions;
@@ -18,10 +17,9 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddApplication();
+// AddInfrastructure registers DbContext + Identity (cookie auth, ApplicationScheme) + TimeProvider.
+// Identity cookie is the sole credential for pages AND hub (ADR-0004); no JWT, no manual AddCookie here.
 builder.Services.AddInfrastructure(builder.Configuration);
-
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddCookie(IdentityConstants.ApplicationScheme);
 
 builder.Services.AddAuthorization();
 
