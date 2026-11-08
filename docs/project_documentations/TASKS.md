@@ -108,17 +108,19 @@
 
 > **Senior designer standard (FR-13, FR-21, FR-22, US-14):** clean, modern, calm — dark-first, one accent (indigo), shape before color. Dark-first tokens only in `site.css` (`--ttt-*`), no hex in views, no Tailwind. Every interaction answers in <150ms. Touch targets ≥44px, `prefers-reduced-motion` collapses motion, board announced via `aria-live`.
 
-- [ ] **Tokens:** `--ttt-bg/surface/border/text/primary/mark-x/mark-o/success/danger/status`, fonts (Inter + JetBrains Mono self-hosted), radius `card/control/pill`, `shadow-card/overlay/glow`, motion `fast 150ms/normal 200ms/slow 300ms/deliberate 500ms` — Bootstrap 5.3 `data-bs-theme` swap, never a per-component concern
-- [ ] **Color rules:** marks only for game semantics, dot+label never color alone, text contrast ≥4.5:1, focus ring ≥3:1 (indigo-400), white reserved for modal headings
-- [ ] **Theme (FR-13):** Light/Dark/Device (default Device), applied **before first paint** (inline head script, no flash), persisted in `localStorage`, switchable from navbar + Settings
-- [ ] **`/Settings` public page (FR-22):** Theme (Light/Dark/Device) × Sound (On/Off, default On) + “Reset to defaults”, browser-only (`localStorage`, no server round-trip), works for guests
-- [ ] **Sound (FR-21):** synthesized Web-Audio tones only (place/win/lose/draw/ping/toggle, no files), always-visible mute toggle, persisted (`ttt:sound`), only after first interaction, null-guarded (missing asset → silence, never broken page)
-- [ ] **Components (taskwise):** Button (press `scale(0.97)` 150ms), Input (label above, red error below, eye toggle), `ttt-card` (24px padding, shadow-card), Avatar (initials, aria-hidden), Badge/StatusDot (Available/Invited/In game + Connected/Reconnecting), Toast (bottom-right, auto-dismiss 4s), Spinner (always with label), Skeleton (1.5s shimmer), `ConnectionBadge` (pulse 2s)
-- [ ] **Board polish:** mark draw SVG stroke-dash 300ms (`ease-out`), winning line draw 500ms + glow pulse, hover ghost preview 150ms (no touch), invalid shake 300ms, turn pulse 2s, board card 560px gap 8px cells ≥64px ghost hover
-- [ ] **Modals/confetti:** result + invitation popup scale 0.96→1 + fade spring 200ms (Esc=Reject for invite, focus on Reject first), confetti 900ms win burst (respects reduced-motion → CSS glow)
-- [ ] **Responsive/a11y:** 360px no h-scroll, layout `≥1024` two-column Home / `768-1023` single / `<768` compact; grid `role=grid/cell` labels “Row N, column M”, keyboard arrows + Enter/Space, `aria-live=polite` (turns/moves/status, countdown every 10s), modal focus trap
-- [ ] **NFR gate:** Lighthouse a11y ≥ 90 / perf ≥ 85, keyboard-complete game, zero console errors, game.js ≤ ~15KB per module
-- [ ] ☑ Owner toggled theme + sound and Settings reflects it
+- [x] **Tokens:** `--ttt-bg/surface/border/text/primary/mark-x/mark-o/success/danger/status`, fonts (Inter + JetBrains Mono self-hosted), radius `card/control/pill`, `shadow-card/overlay/glow`, motion `fast 150ms/normal 200ms/slow 300ms/deliberate 500ms` — Bootstrap 5.3 `data-bs-theme` swap, never a per-component concern
+- [x] **Color rules:** marks only for game semantics, dot+label never color alone, text contrast ≥4.5:1, focus ring ≥3:1 (indigo-400), white reserved for modal headings
+- [x] **Theme (FR-13):** Light/Dark/Device (default Device), applied **before first paint** (inline head script, no flash), persisted in `localStorage`, switchable from navbar + Settings
+- [x] **`/Settings` public page (FR-22):** Theme (Light/Dark/Device) × Sound (On/Off, default On) + “Reset to defaults”, browser-only (`localStorage`, no server round-trip), works for guests
+- [x] **Sound (FR-21):** synthesized Web-Audio tones only (place/win/lose/draw/ping/toggle, no files), always-visible mute toggle, persisted (`ttt:sound`), only after first interaction, null-guarded (missing asset → silence, never broken page)
+- [x] **Components (taskwise):** Button (press `scale(0.97)` 150ms), Input (label above, red error below, eye toggle), `ttt-card` (24px padding, shadow-card), Avatar (initials, aria-hidden), Badge/StatusDot (Available/Invited/In game + Connected/Reconnecting), Toast (bottom-right, auto-dismiss 4s), Spinner (always with label), Skeleton (1.5s shimmer), `ConnectionBadge` (pulse 2s)
+- [x] **Board polish:** mark draw SVG stroke-dash 300ms (`ease-out`), winning line draw 500ms + glow pulse, hover ghost preview 150ms (no touch), invalid shake 300ms, turn pulse 2s, board card 560px gap 8px cells ≥64px ghost hover
+- [x] **Modals/confetti:** result + invitation popup scale 0.96→1 + fade spring 200ms (Esc=Reject for invite, focus on Reject first), confetti 900ms win burst (respects reduced-motion → CSS glow)
+- [x] **Responsive/a11y:** 360px no h-scroll, layout `≥1024` two-column Home / `768-1023` single / `<768` compact; grid `role=grid/cell` labels “Row N, column M”, keyboard arrows + Enter/Space, `aria-live=polite` (turns/moves/status, countdown every 10s), modal focus trap
+- [x] **NFR gate:** Lighthouse a11y ≥ 90 / perf ≥ 85, keyboard-complete game, zero console errors, game.js ≤ ~15KB per module
+- [x] ☑ Owner toggled theme + sound and Settings reflects it
+
+**Evidence (M7.5 closed, owner-confirmed 2026-11-08):** `6fe5262` + follow-ups — `site.css` tokens, pre-paint `_Layout`, `/Settings` 200, theme/sound live, `dotnet build` Release 0 warnings 0 errors · `dotnet test` 107/107.
 
 ## M8 — Guests
 

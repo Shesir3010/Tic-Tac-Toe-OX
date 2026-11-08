@@ -34,7 +34,7 @@ One row per player per finished game — written **once**, never updated (FR-26,
 | --- | --- | --- |
 | `Id` | `uniqueidentifier` | PK |
 | `UserId` | `uniqueidentifier` | FK → `AspNetUsers(Id)`, **CASCADE delete** (account deletion removes your rows) |
-| `OpponentUserId` | `uniqueidentifier` NULL | FK → `AspNetUsers(Id)`, **SET NULL on delete** — deleting your account must never erase your opponent's history |
+| `OpponentUserId` | `uniqueidentifier` NULL | FK → `AspNetUsers(Id)`, **NoAction** (SQL forbids dual Cascade+SetNull to one principal, 1785; DeleteAccount nulls Opponent explicitly first, M12) |
 | `Mode` | `int` | `0` Local · `1` Computer · `2` Online (enum stored as int) |
 | `Difficulty` | `int` NULL | `0` Easy · `1` Medium · `2` Hard; NULL unless Mode = Computer |
 | `Result` | `int` | From **this player's view**: `0` Win · `1` Loss · `2` Draw (stats = counts of `Result` per `UserId`) |
