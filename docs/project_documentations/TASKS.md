@@ -67,11 +67,13 @@
 
 ## M4 — Computer play
 
-- [ ] Mode/difficulty selector (Easy / Medium / Hard) + factory (`IComputerPlayerFactory`)
-- [ ] Computer reply applied inside the same server call (stateless board round-trip)
-- [ ] Board disabled during thinking + thinking status shown
-- [ ] Stateless statelessness proven: no server state is kept between requests
-- [ ] ☑ Owner played all 3 difficulties
+- [x] Mode/difficulty selector (Easy / Medium / Hard) + factory (`IComputerPlayerFactory`)
+- [x] Computer reply applied inside the same server call (stateless board round-trip)
+- [x] Board disabled during thinking + thinking status shown
+- [x] Stateless statelessness proven: no server state is kept between requests
+- [x] ☑ Owner played all 3 difficulties
+
+**Evidence (M4 closed, owner-confirmed 2026-11-08):** `ec0f838` — build Release 0 warnings 0 errors · `dotnet test` 95/95 (12 handler incl. Medium center / Easy seeded / human win no reply) · live Easy X@0→O@6, Medium X@0→O@4, Hard X@0→O@4 (300ms delay, 344ms cmd), `walkthroughs/W-M4-2026-11-08.md`.
 
 ## M5 — Save & forgery proof
 
