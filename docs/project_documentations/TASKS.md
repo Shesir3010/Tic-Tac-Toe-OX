@@ -98,12 +98,18 @@
 
 ## M7.5 — Theme, sound & settings (polish)
 
-- [ ] Tokens `--ttt-*` in `site.css` (dark-first, Inter/JetBrains Mono self-hosted, Bootstrap 5.3 `data-bs-theme` swap)
-- [ ] Theme Light/Dark/Device (default Device), applied **before first paint** (no white flash, inline head script), stored in `localStorage` (FR-13)
-- [ ] `/Settings` **public** page: Theme × Sound (On/Off, default On) + “Reset to defaults”, browser-only, works for guests, no server round-trip (FR-22)
-- [ ] Sound: synthesized Web-Audio tones (place/win/lose/draw), always-visible mute toggle, persisted, only after first interaction (FR-21)
-- [ ] Board polish: winning overlay line + highlight, mark-draw (300ms) + turn pulse + toasts/skeletons, `prefers-reduced-motion` disables animation, responsive down to 360px, keyboard board (arrows + Enter/Space) with `aria-live`
-- [ ] NFR gate: Lighthouse a11y ≥ 90 / perf ≥ 85, keyboard-complete game, zero console errors
+> **Senior designer standard (FR-13, FR-21, FR-22, US-14):** clean, modern, calm — dark-first, one accent (indigo), shape before color. Dark-first tokens only in `site.css` (`--ttt-*`), no hex in views, no Tailwind. Every interaction answers in <150ms. Touch targets ≥44px, `prefers-reduced-motion` collapses motion, board announced via `aria-live`.
+
+- [ ] **Tokens:** `--ttt-bg/surface/border/text/primary/mark-x/mark-o/success/danger/status`, fonts (Inter + JetBrains Mono self-hosted), radius `card/control/pill`, `shadow-card/overlay/glow`, motion `fast 150ms/normal 200ms/slow 300ms/deliberate 500ms` — Bootstrap 5.3 `data-bs-theme` swap, never a per-component concern
+- [ ] **Color rules:** marks only for game semantics, dot+label never color alone, text contrast ≥4.5:1, focus ring ≥3:1 (indigo-400), white reserved for modal headings
+- [ ] **Theme (FR-13):** Light/Dark/Device (default Device), applied **before first paint** (inline head script, no flash), persisted in `localStorage`, switchable from navbar + Settings
+- [ ] **`/Settings` public page (FR-22):** Theme (Light/Dark/Device) × Sound (On/Off, default On) + “Reset to defaults”, browser-only (`localStorage`, no server round-trip), works for guests
+- [ ] **Sound (FR-21):** synthesized Web-Audio tones only (place/win/lose/draw/ping/toggle, no files), always-visible mute toggle, persisted (`ttt:sound`), only after first interaction, null-guarded (missing asset → silence, never broken page)
+- [ ] **Components (taskwise):** Button (press `scale(0.97)` 150ms), Input (label above, red error below, eye toggle), `ttt-card` (24px padding, shadow-card), Avatar (initials, aria-hidden), Badge/StatusDot (Available/Invited/In game + Connected/Reconnecting), Toast (bottom-right, auto-dismiss 4s), Spinner (always with label), Skeleton (1.5s shimmer), `ConnectionBadge` (pulse 2s)
+- [ ] **Board polish:** mark draw SVG stroke-dash 300ms (`ease-out`), winning line draw 500ms + glow pulse, hover ghost preview 150ms (no touch), invalid shake 300ms, turn pulse 2s, board card 560px gap 8px cells ≥64px ghost hover
+- [ ] **Modals/confetti:** result + invitation popup scale 0.96→1 + fade spring 200ms (Esc=Reject for invite, focus on Reject first), confetti 900ms win burst (respects reduced-motion → CSS glow)
+- [ ] **Responsive/a11y:** 360px no h-scroll, layout `≥1024` two-column Home / `768-1023` single / `<768` compact; grid `role=grid/cell` labels “Row N, column M”, keyboard arrows + Enter/Space, `aria-live=polite` (turns/moves/status, countdown every 10s), modal focus trap
+- [ ] **NFR gate:** Lighthouse a11y ≥ 90 / perf ≥ 85, keyboard-complete game, zero console errors, game.js ≤ ~15KB per module
 - [ ] ☑ Owner toggled theme + sound and Settings reflects it
 
 ## M8 — Guests
