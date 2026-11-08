@@ -12,6 +12,7 @@
     </div>
 }
 <div class="ttt-home">
+    <div class="ttt-left">
     @if (User.Identity?.IsAuthenticated == true)
     {
         <div class="ttt-userbox" aria-label="Your account">
@@ -33,6 +34,7 @@
         <p id="waiting-card" class="ttt-waiting" hidden>Waiting for <span id="waiting-name"></span>… <button type="button" id="btn-cancel-invite" class="btn btn-sm btn-outline-secondary">Cancel</button></p>
         <ul id="online-list" class="ttt-lobby-list"></ul>
     </aside>
+    </div>
 
     <div id="invite-popup" class="modal" tabindex="-1" hidden role="dialog" aria-modal="true" aria-labelledby="popup-title">
         <div class="modal-dialog">
