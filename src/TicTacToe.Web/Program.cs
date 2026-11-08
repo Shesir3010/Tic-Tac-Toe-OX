@@ -16,6 +16,7 @@ builder.Host.UseSerilog((context, loggerConfiguration) =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+builder.Services.AddHealthChecks();
 builder.Services.AddApplication();
 // AddInfrastructure registers DbContext + Identity (cookie auth, ApplicationScheme) + TimeProvider.
 // Identity cookie is the sole credential for pages AND hub (ADR-0004); no JWT, no manual AddCookie here.
