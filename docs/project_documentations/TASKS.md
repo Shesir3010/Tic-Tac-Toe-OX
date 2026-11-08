@@ -45,11 +45,13 @@
 
 ## M2 — AI (Easy → Medium → Hard)
 
-- [ ] Easy: seeded `IRandomSource`, legal move only
-- [ ] Medium: takes an immediate win → blocks an immediate loss → center → corner → any
-- [ ] Hard: exhaustive minimax (memoized), prefers fastest win
-- [ ] Hard **never loses** — exhaustive sweep proves it
-- [ ] Reply lands ≤ 500 ms total incl. artificial 300–500 ms "thinking" delay; board non-interactive meanwhile
+- [x] Easy: seeded `IRandomSource`, legal move only
+- [x] Medium: takes an immediate win → blocks an immediate loss → center → corner → any
+- [x] Hard: exhaustive minimax (memoized), prefers fastest win
+- [x] Hard **never loses** — exhaustive sweep proves it
+- [x] Reply lands ≤ 500 ms total incl. artificial 300–500 ms "thinking" delay; board non-interactive meanwhile
+
+**Evidence (M2 closed 2026-11-08):** Domain `IComputerPlayer` + `EasyAi`/`MediumAi`/`HardAi` + `IRandomSource` + `Difficulty` + `SystemRandomSource` + `ComputerPlayerFactory` (DI in Infrastructure only) — `dotnet build` Release 0 warnings 0 errors · `dotnet test` 83/83 (6 architecture + 44 engine + 33 AI/factory) · Hard sweeps (as X and as O) 0 losses in ~0.8s, `ChooseMove` <500ms (152ms measured).
 
 ## M3 — Local pass-and-play
 
