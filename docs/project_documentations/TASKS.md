@@ -142,13 +142,15 @@
 
 ## M10 — Invitations
 
-- [ ] `SendInvitationCommand` / `CancelInvitationCommand` / `RespondToInvitationCommand` + TTL ~30 s + cooldown ~30 s
-- [ ] Guard tests green (self / offline / In game / Invited / cooldown → `Invite.*` codes)
-- [ ] Invitation popup on every page (Accept / Reject + 30 s bar)
-- [ ] Atomic accept: exactly-once room creation, inviter = X
-- [ ] `RespondToInvitation` cancel-on-offline behavior
-- [ ] Unit-tested with fake time (TTL + cooldown)
-- [ ] W-1, W-2, W-5, W-10 passed
+- [x] `SendInvitationCommand` / `CancelInvitationCommand` / `RespondToInvitationCommand` + TTL ~30 s + cooldown ~30 s
+- [x] Guard tests green (self / offline / In game / Invited / cooldown → `Invite.*` codes)
+- [x] Invitation popup on every page (Accept / Reject + 30 s bar)
+- [x] Atomic accept: exactly-once room creation, inviter = X
+- [x] `RespondToInvitation` cancel-on-offline behavior
+- [x] Unit-tested with fake time (TTL + cooldown)
+- [x] W-1, W-2, W-5, W-10 passed
+
+**Evidence (M10 closed, owner-confirmed 2026-11-09):** commands + `InvitationManager` (TTL/cooldown/guards, fake-time tests) + `GameHub` per-participant delivery (`750ad77`: Waiting clears on Accepted/Declined/Cancelled; `c4956d4`: Declined → inviter only, Cancelled → target/counterpart only) · popup professional in `_Layout` + countdown + Esc=Reject · owner live bug reports fixed (stuck Waiting) · build Release 0 warnings 0 errors · tests 126/126 · scripts self-contained in `05-quality/test-plan.md` §3, see `walkthroughs/W-M10-2026-11-09.md`.
 
 ## M11 — Rooms
 
