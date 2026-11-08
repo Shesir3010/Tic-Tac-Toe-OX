@@ -95,7 +95,7 @@ boardEl.addEventListener('click', async (e) => {
     body: JSON.stringify({
       cells,
       moveIndex: index,
-      mark: 0,
+      mark: turn,
       mode: Number(modeEl.value),
       difficulty: modeEl.value === '1' ? Number(difficultyEl.value) : null,
     }),
