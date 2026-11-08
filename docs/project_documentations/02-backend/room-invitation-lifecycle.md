@@ -106,6 +106,24 @@ Full client contract: [realtime-signalr.md](../01-architecture/realtime-signalr.
 
 Cross-container work exists in exactly one place — **accept**: invitation lock acquired **first**, room lock **second**. No other cross-container sequence exists in v1; adding one requires amending this file + [ADR-0014](../01-architecture/adr/0014-in-memory-state-trio.md).
 
+## 6. Client-visible landing (what the lobby must show)
+
+Backend states map 1:1 to lobby UI on **every page** (hub is site-wide, popup in `_Layout`):
+
+| Terminal state | Inviter (sender) sees | Target (invitee) sees | Rule |
+| --- | --- | --- | --- |
+| `Accepted` (room created, inviter = X) | Waiting card **hides** → green `room-status` banner: “Room {id}… ready — you are X. Online play continues next (M11).” + success toast | Popup hides → same green banner: “you are O…” + success toast | Room id is from the `RoomState` payload (first 8 chars, display only) |
+| `Rejected` (decline) | Waiting card **hides** → red `invite-status` banner: “{name} declined your invitation. You can invite again after 30s cooldown.” + toast | Popup hides → red banner: “You declined the invitation.” + toast | Cooldown message is always shown (server enforces 30 s) |
+| `Cancelled` (inviter cancel / either party offline) | Waiting card **hides** → red banner: “Invitation cancelled.” / “The other player went offline. Invitation cancelled.” + toast | Popup hides (if open) → same red banner + toast | Offline cancel is immediate, no grace (FR-35) |
+| `Expired` (~30 s, no answer) | Waiting card **hides** → red banner: “Invitation expired.” + toast (target auto-rejects on timeout) | N/A (popup already closed on timeout) | Target auto-sends `RespondToInvitation(false)` on 30 s countdown end |
+
+Other client rules (M10):
+
+- Waiting card shows **immediately** on `InvitePlayer` success — sender never waits for the toast (FR-33 visual).
+- `Invite` buttons for the pending target show `Waiting…` disabled; all buttons reset when the Waiting card hides.
+- Invitations are delivered **only to the two participants** (per-user `Clients.User`), never `All` — bystanders see nothing.
+- Room page (`/Rooms/{id}`) navigation on accept arrives in **M11**; until then the green banner is the correct M10 landing (no dead end, no stuck Waiting).
+
 ## Assumptions
 
 - Grace (60 s) applies only to `Playing` rooms — invitations and finished rooms follow their own timers.

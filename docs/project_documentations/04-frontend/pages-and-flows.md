@@ -162,13 +162,14 @@ Routing is server-side (MVC controllers) — there is no SPA router; the hub is 
 | Region | Component(s) | Description |
 | --- | --- | --- |
 | A — Player row | Avatar + name + StatusDot/Badge + Invite button | Invite disabled with tooltip unless status = Available; "Invited"/"In game" rows are read-only (dot + label) |
-| B — Waiting card | Card + spinner + live-draining 30 s progress bar + Cancel | Shows while an outgoing invitation is pending; auto-hides on `InvitationAccepted/Declined/Expired/Cancelled` |
+| B — Waiting card | Card + spiral + live-draining 30 s progress bar + Cancel | Shows while an outgoing invitation is pending; **auto-hides** on `InvitationAccepted/Declined/Expired/Cancelled` (§9.2) |
+| B2 — Lobby status banners | Red `invite-status` (decline/cancel/expire) + green `room-status` (accepted), mutually exclusive, `aria-live` | Persist until next invitation; toast is secondary only (never the sole signal) |
 | C — Mode cards | Card + icon + title + description + ghost CTA | "Play vs computer" (difficulty select); "Play local" (pass-and-play); "Quick match" is **not** in v1 (auto-matchmaking is out of scope, not scheduled) |
 | D — Connection badge | Presence dot pulse on hub disconnect | Amber "Reconnecting…" on auto-reconnect, emerald "Connected" otherwise |
 
 ### 4.4 Invite behavior
 
-Click **Invite** → `SendInvitationCommand` (hub `InvitePlayer`) → waiting card shows immediately (the **sender never waits for the response toast**) → `InvitationReceived` arrives on the invitee's popup → outcomes: Accepted (both navigate to room), Rejected/Expired/Cancelled (waiting card clears + notice).
+Click **Invite** → `SendInvitationCommand` (hub `InvitePlayer`) → waiting card shows immediately (the **sender never waits for the response toast**) → `InvitationReceived` arrives on the invitee's popup → outcomes: Accepted (green `room-status` banner now, `/Rooms/{id}` in M11), Rejected/Expired/Cancelled (Waiting card clears + red `invite-status` banner + toast). All four terminal states clear the Waiting card on **both** sides — a stuck Waiting is a bug.
 
 ---
 
@@ -247,9 +248,9 @@ Visitor opens / → Game page (local + vs computer)
 Player A invites Available B (hub InvitePlayer)
   → A: waiting card + 30 s bar
   → B: popup Accept/Reject (on any page, 30 s drain bar)
-  → B Accept → atomic room creation → both land on /Rooms/{id}, A = X
-  → B Reject → A sees "[name] declined." + 30 s cooldown from re-invites
-  → 30 s no answer → A: "No answer — the invitation expired."
+  → B Accept → atomic room creation → M10: both show green room-status banner (A = X, B = O); M11: both land on /Rooms/{id}
+  → B Reject → A: red "declined + cooldown 30s" banner (Waiting hides); B: red "You declined" banner
+  → 30 s no answer → A: "No answer — the invitation expired." (Waiting hides)
 ```
 
 ### 9.3 Play → Finish → Rematch (FR-26…FR-31)
