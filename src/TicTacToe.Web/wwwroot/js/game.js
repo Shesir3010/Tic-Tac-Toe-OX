@@ -13,7 +13,9 @@ const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]
 const authenticated = document.querySelector('meta[name="ttt:authenticated"]')?.content === 'true';
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-if (!document.getElementById('win-line')) {
+let winOverlay = document.getElementById('win-line');
+if (!winOverlay || winOverlay.tagName.toLowerCase() !== 'svg') {
+  winOverlay?.remove();
   const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   overlay.setAttribute('id', 'win-line');
   overlay.setAttribute('viewBox', '0 0 100 100');
@@ -54,7 +56,7 @@ function statusText(result) {
 function drawWinLine(line) {
   const overlay = document.getElementById('win-line');
   if (!overlay) return;
-  if (!line || line.length !== 3 || reducedMotion) { overlay.hidden = true; return; }
+  if (!line || line.length !== 3 || reducedMotion) { overlay.hidden = true; overlay.innerHTML = ''; return; }
   const [a, , c] = line;
   const ax = (a % 3) * 33.333 + 16.667, ay = Math.floor(a / 3) * 33.333 + 16.667;
   const cx = (c % 3) * 33.333 + 16.667, cy = Math.floor(c / 3) * 33.333 + 16.667;
