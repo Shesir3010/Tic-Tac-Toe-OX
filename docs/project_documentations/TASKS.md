@@ -8,24 +8,26 @@
 
 ## M0 — Spike: host + solution skeleton
 
-- [ ] Create `TicTacToe.slnx` and the 4 projects:
-  - [ ] `src/TicTacToe.Domain` — **zero references** (verify by solution build)
-  - [ ] `src/TicTacToe.Application` — references **Domain only**
-  - [ ] `src/TicTacToe.Infrastructure` — references **Application + Domain**
-  - [ ] `src/TicTacToe.Web` (ASP.NET Core MVC, .NET 10) — references **Application** + the one Infrastructure DI call only
-- [ ] Dependency rule enforced by project references (Web → Application → Domain ← Infrastructure, never outward)
-- [ ] `test/TicTacToe.Application.UnitTests/` — the **only** test project (NUnit + Moq + Shouldly + AutoMock), plus `ArchitectureTests.cs` (R-A1…R-A5)
-- [ ] Folder tree per `01-architecture/clean-architecture-ddd.md` §3: `Features/{Area}/{Feature}/Command|Query`, `Contracts/`, `Mapping/`, `Settings/`, `Data/`, `Identity/`, `Services/`, `Controllers/`, `Hubs/`, `Middleware/`, `wwwroot/{css,js,lib}`, `test/TicTacToe.Application.UnitTests/` skeleton
-- [ ] `Directory.Packages.props` — pinned: Cortex.Mediator 3.1.2, Mapster 10.0.14, Serilog 10.0.0, EF Core/Identity 10.0.x (any other package = decision entry, [ADR-0012](01-architecture/adr/0012-pinned-stable-stack.md))
-- [ ] `Program.cs` composition root: `AddApplication()` + `AddInfrastructure()` chained; `ValidateScopes` in Development
-- [ ] Serilog configured (console + rolling file `logs/`, request logging); **never** log passwords/tokens/connection strings/full emails
-- [ ] `.github/workflows/dotnet.yml` → restore → build (warnings as errors) → `dotnet test` — green on ($) dotnet build zero warnings, CI first PR green
-- [ ] Identity cookie wired in `Program.cs` (`IdentityConstants.ApplicationScheme`); SQL Server **Express** connection via user-secrets only (never committed); CSS/Javascript folders exist under `wwwroot/`
-- [ ] `spikes/SignalRCheck/` SignalR/websockets check — **result recorded**, then throwaway deleted
-- [ ] EF migration plumbing: `AddInfrastructure(IConfiguration)` + initial migration applies green on Express via `dotnet ef database update`
-- [ ] Owner checklist: app opens on the host plan; walkthrough M0 evidence recorded
+- [x] Create `TicTacToe.slnx` and the 4 projects:
+  - [x] `src/TicTacToe.Domain` — **zero references** (verify by solution build)
+  - [x] `src/TicTacToe.Application` — references **Domain only**
+  - [x] `src/TicTacToe.Infrastructure` — references **Application + Domain**
+  - [x] `src/TicTacToe.Web` (ASP.NET Core MVC, .NET 10) — references **Application** + the one Infrastructure DI call only
+- [x] Dependency rule enforced by project references (Web → Application → Domain ← Infrastructure, never outward)
+- [x] `test/TicTacToe.Application.UnitTests/` — the **only** test project (NUnit + Moq + Shouldly + AutoMock), plus `ArchitectureTests.cs` (R-A1…R-A5)
+- [x] Folder tree per `01-architecture/clean-architecture-ddd.md` §3: `Features/{Area}/{Feature}/Command|Query`, `Contracts/`, `Mapping/`, `Settings/`, `Data/`, `Identity/`, `Services/`, `Controllers/`, `Hubs/`, `Middleware/`, `wwwroot/{css,js,lib}`, `test/TicTacToe.Application.UnitTests/` skeleton
+- [x] `Directory.Packages.props` — pinned: Cortex.Mediator 3.1.2, Mapster 10.0.14, Serilog 10.0.0, EF Core/Identity 10.0.x (any other package = decision entry, [ADR-0012](01-architecture/adr/0012-pinned-stable-stack.md))
+- [x] `Program.cs` composition root: `AddApplication()` + `AddInfrastructure()` chained; `ValidateScopes` in Development
+- [x] Serilog configured (console + rolling file `logs/`, request logging); **never** log passwords/tokens/connection strings/full emails
+- [x] `.github/workflows/dotnet.yml` → restore → build (warnings as errors) → `dotnet test` — green on ($) dotnet build zero warnings, CI first PR green
+- [x] Identity cookie wired in `Program.cs` (`IdentityConstants.ApplicationScheme`); SQL Server **Express** connection via user-secrets only (never committed); CSS/Javascript folders exist under `wwwroot/`
+- [x] `spikes/SignalRCheck/` SignalR/websockets check — **result recorded**, then throwaway deleted
+- [x] EF migration plumbing: `AddInfrastructure(IConfiguration)` + initial migration applies green on Express via `dotnet ef database update`
+- [x] Owner checklist: app opens on the host plan; walkthrough M0 evidence recorded
 
 **Gate:** `dotnet build` zero warnings · CI green on first PR · pins in `Directory.Packages.props` · spike negotiates SignalR on the host plan.
+
+**Evidence (M0 closed, owner-confirmed 2026-11-08):** CI run #1 `5b23936` green · spike `walkthroughs/W-M0-2026-11-08.md` (200 + connectionId, spike deleted) · EF `walkthroughs/W-M0-EF-2026-11-08.md` (`20261108090327_InitialIdentity` on Express 2025, backup `C:\Temp\TicTacToe-backup-20261108.bak`) · owner `walkthroughs/W-M0-OWNER-2026-11-08.md` (“opened OK”). Build Release 0 warnings 0 errors, tests 5/5.
 
 ## M1 — Engine core
 
