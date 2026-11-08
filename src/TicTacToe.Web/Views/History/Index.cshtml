@@ -1,0 +1,72 @@
+@* History & stats (FR-16/FR-17): totals computed from rows, newest first. *@
+@model TicTacToe.Web.Models.HistoryViewModel
+@{
+    ViewData["Title"] = "History";
+    var winPct = Model.Stats is null || Model.Stats.Played == 0 ? 0 : Model.Stats.Wins * 100.0 / Model.Stats.Played;
+}
+
+<div class="ttt-game">
+    <h1>History</h1>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <p class="text-danger">@Model.Error</p>
+    }
+
+    @if (Model.Stats is not null)
+    {
+        <div class="ttt-scoreboard">
+            <span>Played <strong>@Model.Stats.Played</strong></span>
+            <span>Won <strong>@Model.Stats.Wins</strong></span>
+            <span>Lost <strong>@Model.Stats.Losses</strong></span>
+            <span>Win <strong>@winPct.ToString("0")%</strong></span>
+        </div>
+    }
+
+    @if (Model.Items.Count == 0)
+    {
+        <p>No games yet — play your first game!</p>
+        <a class="btn btn-primary" href="/">Play vs computer</a>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+            <tr><th>Date (UTC)</th><th>Mode</th><th>Symbol</th><th>Opponent</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.PlayedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.Mode@(item.Difficulty is null ? "" : $" ({item.Difficulty})")</td>
+                    <td>@item.Symbol</td>
+                    <td>@(item.OpponentName ?? "Deleted player")</td>
+                    <td>
+                        @if (item.Result == TicTacToe.Domain.Enums.MatchResult.Win)
+                        {
+                            <span class="badge bg-success">Win</span>
+                        }
+                        else if (item.Result == TicTacToe.Domain.Enums.MatchResult.Loss)
+                        {
+                            <span class="badge bg-danger">Loss</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Draw</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        <div class="d-flex gap-2">
+            @if (Model.Page > 1)
+            {
+                <a class="btn btn-outline-primary" href="/History/Index?page=@(Model.Page - 1)">Previous</a>
+            }
+            <a class="btn btn-outline-primary" href="/History/Index?page=@(Model.Page + 1)">Next</a>
+        </div>
+    }
+</div>
