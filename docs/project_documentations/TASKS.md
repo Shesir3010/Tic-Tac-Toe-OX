@@ -132,11 +132,13 @@
 
 ## M9 — Presence
 
-- [ ] `GameHub` as command gateway (`[Authorize]`, cookie) — authenticates, dispatches, broadcasts, **zero rules**
-- [ ] `PresenceTracker` singleton (userId → connectionCount)
-- [ ] Online list updates live (no refresh) with Available/Invited/In game statuses
-- [ ] Disconnect flips presence (userId→count → 0)
-- [ ] ☑ Owner observed the live list in two browsers
+- [x] `GameHub` as command gateway (`[Authorize]`, cookie) — authenticates, dispatches, broadcasts, **zero rules**
+- [x] `PresenceTracker` singleton (userId → connectionCount)
+- [x] Online list updates live (no refresh) with Available/Invited/In game statuses
+- [x] Disconnect flips presence (userId→count → 0)
+- [x] ☑ Owner observed the live list in two browsers
+
+**Evidence (M9 closed, owner-confirmed 2026-11-09):** `GameHub` + `PresenceTracker` + `hub.js` (`src/TicTacToe.Web/Hubs/GameHub.cs`, `src/TicTacToe.Infrastructure/Services/PresenceTracker.cs`, `src/TicTacToe.Web/wwwroot/js/hub.js`) · owner two-browser live list check passed (`walkthroughs/W-M9-2026-11-09.md`) · build Release 0 warnings 0 errors · tests 126/126 · UI restored to `c241307` (`9e1ef76`).
 
 ## M10 — Invitations
 
