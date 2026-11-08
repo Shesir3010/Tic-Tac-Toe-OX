@@ -7,8 +7,10 @@ namespace TicTacToe.Web.Controllers;
 
 /// <summary>Online room page — membership checked by GetRoomQuery (non-players get the error view).</summary>
 [Authorize]
+[Route("Rooms/{id:guid}")]
 public sealed class RoomsController(IMediator mediator) : Controller
 {
+    [HttpGet]
     public async Task<IActionResult> Index(Guid id)
     {
         var result = await mediator.SendAsync(new GetRoomQuery(id));
