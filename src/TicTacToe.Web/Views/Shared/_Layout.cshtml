@@ -19,65 +19,59 @@
     <link rel="stylesheet" href="~/TicTacToe.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Tic Tac Toe</a>
+    <header class="ttt-header">
+        <nav class="navbar navbar-expand-sm navbar-dark" aria-label="Primary">
+            <div class="container ttt-nav">
+                <a class="ttt-brand" asp-area="" asp-controller="Home" asp-action="Index" aria-label="Tic Tac Toe home">
+                    <span class="ttt-brand-mark" aria-hidden="true"><span class="ttt-mark-x">X</span><span class="ttt-mark-o">O</span></span>
+                    <span class="ttt-brand-text">Tic Tac Toe</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 ttt-nav-links">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Play</a>
+                            <a class="nav-link ttt-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Play</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="History" asp-action="Index">History</a>
+                                <a class="nav-link ttt-nav-link" asp-controller="History" asp-action="Index">History</a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Settings" asp-action="Index">Settings</a>
+                            <a class="nav-link ttt-nav-link" asp-controller="Settings" asp-action="Index">Settings</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post"><button class="nav-link btn btn-link" type="submit">Logout (@User.Identity?.Name)</button></form>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline"><button class="nav-link btn btn-link ttt-nav-link" type="submit">Logout (@User.Identity?.Name)</button></form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link ttt-nav-link" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="nav-link ttt-nav-link" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <button class="nav-link btn btn-link" id="nav-sound" type="button" aria-label="Toggle sound">🔊</button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link btn btn-link" id="nav-theme" type="button" aria-label="Toggle theme">🌙</button>
+                        <li class="nav-item ttt-nav-tools">
+                            <button class="ttt-icon-btn" id="nav-sound" type="button" aria-label="Toggle sound" title="Sound">🔊</button>
+                            <button class="ttt-icon-btn" id="nav-theme" type="button" aria-label="Toggle theme" title="Theme">🌙</button>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main class="container" role="main">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TicTacToe.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="~/js/site.js" asp-append-version="true"></script>

@@ -157,6 +157,24 @@ ttt-card, .ttt-card {
 
 .ttt-controls label { display: inline-flex; flex-direction: column; gap: 4px; margin-right: 12px; text-align: left; }
 
+/* M7.5 header polish — sticky blur, brand mark, pill nav, icon buttons */
+.ttt-header {
+  position: sticky; top: 0; z-index: 1030;
+  background: color-mix(in srgb, var(--ttt-surface) 86%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ttt-border-subtle);
+}
+.ttt-nav { max-width: 1140px; }
+.ttt-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; letter-spacing: -.01em; }
+.ttt-brand-mark { display: inline-flex; gap: 4px; font-size: 1.25rem; font-weight: 800; }
+.ttt-brand-text { color: var(--ttt-text-primary); }
+.ttt-nav-links { gap: 4px; }
+.ttt-nav-link { border-radius: var(--ttt-radius-pill); padding: .5rem .9rem !important; color: var(--ttt-text-secondary) !important; font-weight: 600; }
+.ttt-nav-link:hover, .ttt-nav-link:focus-visible { color: var(--ttt-text-primary) !important; background: var(--ttt-surface-raised); }
+.ttt-nav-tools { display: inline-flex; gap: 6px; margin-left: 8px; }
+.ttt-icon-btn { width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--ttt-border-subtle); background: var(--ttt-surface-raised); color: var(--ttt-text-primary); }
+.ttt-icon-btn:hover { background: var(--ttt-border-strong); }
+
 .ttt-toast {
   position: fixed; right: 16px; bottom: 16px; z-index: 1050;
   background: var(--ttt-surface); color: var(--ttt-text-primary);
