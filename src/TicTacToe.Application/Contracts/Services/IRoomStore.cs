@@ -10,6 +10,7 @@ public interface IRoomStore
     (bool ok, RoomState? room, string errorCode) Create(Guid inviterId, Guid targetId);
     RoomState? Get(Guid id);
     bool IsInGame(Guid userId);
+    IReadOnlyList<Guid> GetPlayingRoomIds(Guid userId);
     (RoomState? room, string errorCode, IReadOnlyList<int> moves, GameOutcome outcome, bool finished) ApplyMove(Guid roomId, Guid playerId, int index);
     (RoomState? room, string errorCode, bool forfeit, IReadOnlyList<int> moves, GameOutcome outcome) Leave(Guid roomId, Guid playerId);
     (RoomState? room, string errorCode) RequestRematch(Guid roomId, Guid playerId);

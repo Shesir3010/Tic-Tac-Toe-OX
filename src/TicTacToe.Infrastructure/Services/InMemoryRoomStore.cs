@@ -49,6 +49,14 @@ public sealed class InMemoryRoomStore : IRoomStore
         }
     }
 
+    public IReadOnlyList<Guid> GetPlayingRoomIds(Guid userId)
+    {
+        lock (_gate)
+        {
+            return _rooms.Values.Where(r => r.Status == RoomStatus.Playing && IsParticipant(r, userId)).Select(r => r.Id).ToList();
+        }
+    }
+
     public (RoomState? room, string errorCode, IReadOnlyList<int> moves, GameOutcome outcome, bool finished) ApplyMove(Guid roomId, Guid playerId, int index)
     {
         var gate = GetLock(roomId);

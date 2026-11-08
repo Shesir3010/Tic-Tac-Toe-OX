@@ -29,8 +29,11 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         await base.OnDisconnectedAsync(exception);
         if (Guid.TryParse(Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
         {
-            var pending = invitations.GetPendingForUser(userId);
             presence.RemoveUser(userId);
+            var stillOnline = presence.ConnectionCount(userId) > 0;
+            await BroadcastOnline();
+            if (stillOnline) return; // Multi-tab: another connection still counts as online.
+            var pending = invitations.GetPendingForUser(userId);
             invitations.CancelForOffline(userId);
             foreach (var inv in pending)
             {
@@ -39,12 +42,12 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
                     "InvitationCancelled",
                     new { invitationId = inv.Id.ToString(), reason = "offline" });
             }
-            // M11 grace: Playing rooms get a 60s deadline; opponent sees countdown.
             var deadline = clock.GetUtcNow().AddSeconds(60);
-            // Broadcast disconnected to the room group after marking deadline via store sweep hook (GetRoom polling + direct group message).
-            await BroadcastOnline();
-            // Opponent notification is group-based once clients join room-{id} via GetRoom.
-            await Clients.All.SendAsync("PlayerDisconnected", new { userId = userId.ToString(), secondsLeft = 60 });
+            foreach (var roomId in rooms.GetPlayingRoomIds(userId))
+            {
+                rooms.MarkDisconnected(roomId, userId, deadline);
+                await Clients.Group($"room-{roomId}").SendAsync("PlayerDisconnected", new { id = roomId.ToString(), userId = userId.ToString(), secondsLeft = 60 });
+            }
         }
     }
 
