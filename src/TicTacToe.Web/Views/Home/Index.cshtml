@@ -5,6 +5,16 @@
 
 <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
 <div class="ttt-home">
+    <aside id="lobby" class="ttt-lobby" aria-label="Online players">
+        <div class="ttt-lobby-head">
+            <span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>
+            <h2>Online players</h2>
+            <span id="lobby-count" class="ttt-lobby-count" aria-live="polite">0 online</span>
+        </div>
+        <p class="ttt-lobby-sub">Find someone to play right now.</p>
+        <ul id="online-list" class="ttt-lobby-list"></ul>
+    </aside>
+
     <div class="ttt-game">
         @if (User.Identity?.IsAuthenticated != true)
         {
@@ -59,16 +69,6 @@
 
         @Html.AntiForgeryToken()
     </div>
-
-    <aside id="lobby" class="ttt-lobby" aria-label="Online players">
-        <div class="ttt-lobby-head">
-            <span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>
-            <h2>Online players</h2>
-            <span id="lobby-count" class="ttt-lobby-count" aria-live="polite">0 online</span>
-        </div>
-        <p class="ttt-lobby-sub">Find someone to play right now.</p>
-        <ul id="online-list" class="ttt-lobby-list"></ul>
-    </aside>
 </div>
 
 @section Scripts {

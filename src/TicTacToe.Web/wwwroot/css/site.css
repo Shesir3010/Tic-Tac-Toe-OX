@@ -97,7 +97,7 @@ body { margin-bottom: 60px; }
 
 /* Tic Tac Toe board (M3 local pass-and-play) */
 .ttt-home { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 1140px; margin: 2rem auto; align-items: start; }
-@media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(0, 560px) minmax(280px, 340px); } }
+@media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(280px, 340px) minmax(0, 560px); } }
 .ttt-lobby { background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }
 .ttt-lobby-head { display: flex; align-items: center; gap: 10px; }
 .ttt-lobby-head h2 { font-size: 1.25rem; margin: 0; color: var(--ttt-text-primary); }
