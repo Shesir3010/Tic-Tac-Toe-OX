@@ -1,6 +1,4 @@
 // Online room — render-only. Server RoomState replaces the board wholesale (never merges).
-import { sounds } from './sound.js';
-
 const roomId = document.querySelector('meta[name="ttt:room-id"]')?.content;
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('room-status');
@@ -9,21 +7,63 @@ const graceBanner = document.getElementById('grace-banner');
 const graceSeconds = document.getElementById('grace-seconds');
 const leaveBtn = document.getElementById('btn-leave');
 const rematchBtn = document.getElementById('btn-rematch');
+const rematchStatus = document.getElementById('rematch-status');
+const rematchText = document.getElementById('rematch-status-text');
+const leaveModal = document.getElementById('leave-modal');
+const btnLeaveCancel = document.getElementById('btn-leave-cancel');
+const btnLeaveConfirm = document.getElementById('btn-leave-confirm');
+const leftModal = document.getElementById('left-modal');
+const btnLeftHome = document.getElementById('btn-left-home');
 const myId = document.querySelector('meta[name="ttt:user-id"]')?.content || '';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const winOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+winOverlay.setAttribute('id', 'win-line');
+winOverlay.setAttribute('viewBox', '0 0 100 100');
+winOverlay.setAttribute('preserveAspectRatio', 'none');
+winOverlay.classList.add('ttt-win-line');
+winOverlay.hidden = true;
+winOverlay.setAttribute('aria-hidden', 'true');
+boardEl.appendChild(winOverlay);
 
 let hubConn = null;
 let state = null;
 let graceTimer = null;
 let pollTimer = null;
+let rematchRequested = false;
+
+function drawWinLine(line) {
+  if (!line || line.length !== 3 || reducedMotion) { winOverlay.hidden = true; winOverlay.innerHTML = ''; return; }
+  const [a, , c] = line;
+  const btns = boardEl.querySelectorAll('.ttt-cell');
+  const boardRect = boardEl.getBoundingClientRect();
+  const aRect = btns[a].getBoundingClientRect();
+  const cRect = btns[c].getBoundingClientRect();
+  const ax = ((aRect.left - boardRect.left) + aRect.width / 2) / boardRect.width * 100;
+  const ay = ((aRect.top - boardRect.top) + aRect.height / 2) / boardRect.height * 100;
+  const cx = ((cRect.left - boardRect.left) + cRect.width / 2) / boardRect.width * 100;
+  const cy = ((cRect.top - boardRect.top) + cRect.height / 2) / boardRect.height * 100;
+  winOverlay.innerHTML = `<line x1="${ax}%" y1="${ay}%" x2="${cx}%" y2="${cy}%"></line>`;
+  winOverlay.hidden = false;
+}
 
 async function startHub() {
   hubConn = new signalR.HubConnectionBuilder().withUrl('/hubs/game').withAutomaticReconnect().build();
   hubConn.on('MoveApplied', (p) => render(p.room));
-  hubConn.on('RematchStarted', (p) => { render(p.room); toast('Rematch started — X to move.', 'success'); });
+  hubConn.on('RematchStarted', (p) => { rematchRequested = false; render(p.room); toast('Rematch started — X to move.', 'success'); });
+  hubConn.on('RematchRequested', (p) => { showRematch(`Rematch requested by ${p.byName || 'opponent'} — press Rematch to accept.`); });
   hubConn.on('PlayerDisconnected', (p) => startGrace(p.secondsLeft || 60));
   hubConn.on('PlayerReconnected', () => stopGrace());
   hubConn.on('RoomClosed', (p) => { toast(`Room closed (${p.reason}).`, 'info'); statusEl.textContent = 'Room closed.'; });
-  hubConn.on('PlayerLeft', (p) => { if (p?.room) render(p.room); });
+  hubConn.on('PlayerLeft', (p) => {
+    if (!p?.room) { showLeftModal('Opponent left the game. You win!'); return; }
+    render(p.room);
+    // Mid-game leave = forfeit. Staying player sees the winner modal, then goes home.
+    if (statusOf(p.room) === 'Finished' || statusOf(p.room) === 'Closed') {
+      showLeftModal('Opponent left the game. You win!');
+      setTimeout(() => { if (leftModal.hidden === false) window.location.href = '/'; }, 4000);
+    }
+  });
   await hubConn.start();
   await loadRoom();
   pollTimer = setInterval(loadRoom, 5000);
@@ -37,41 +77,62 @@ async function loadRoom() {
 }
 
 function statusOf(room) {
-  // Wire enums are numbers (RoomStatus Playing=0, Finished=1, Closed=2) — accept strings too.
   return room.status === 0 || room.status === 'Playing' ? 'Playing'
     : room.status === 1 || room.status === 'Finished' ? 'Finished' : 'Closed';
+}
+function sameId(a, b) { return String(a || '').toLowerCase() === String(b || '').toLowerCase(); }
+function myMark(room) { return sameId(room.playerXId, myId) ? 0 : 1; }
+function isMyTurn(room) {
+  const turn = room.turn === 0 ? 0 : 1;
+  return turn === myMark(room);
 }
 
 function render(room) {
   state = room;
   const st = statusOf(room);
   const cells = boardEl.querySelectorAll('.ttt-cell');
+  const result = room.result;
+  const winning = result?.winningLine || result?.WinningLine;
   cells.forEach((cell, i) => {
     const v = room.board?.[i];
     cell.textContent = v === 0 ? 'X' : v === 1 ? 'O' : '';
+    cell.classList.toggle('ttt-mark-x', v === 0);
+    cell.classList.toggle('ttt-mark-o', v === 1);
+    cell.classList.remove('ttt-winning');
     cell.disabled = st !== 'Playing' || !isMyTurn(room);
     cell.setAttribute('aria-label', `Row ${Math.floor(i / 3) + 1}, column ${(i % 3) + 1}, ${v === 0 ? 'X' : v === 1 ? 'O' : 'empty'}`);
   });
+  if (st === 'Finished' && winning) {
+    winning.forEach(i => cells[i].classList.add('ttt-winning'));
+    drawWinLine(winning);
+  } else {
+    drawWinLine(null);
+  }
+  const markLabel = myMark(room) === 0 ? 'X' : 'O';
   if (st === 'Playing') {
-    statusEl.textContent = isMyTurn(room) ? 'Your turn' : "Opponent's turn";
+    statusEl.textContent = isMyTurn(room) ? `Your turn as ${markLabel}` : `Opponent's turn`;
     rematchBtn.hidden = true;
+    hideRematch();
     errorEl.hidden = true;
   } else if (st === 'Finished') {
-    const r = room.result;
-    statusEl.textContent = r ? (r.outcome === 3 ? "It's a draw." : myMark(room) === r.outcome ? 'You win!' : 'Opponent wins.') : 'Finished.';
+    const outcome = result?.outcome ?? result?.Outcome;
+    let text = 'Finished.';
+    if (outcome === 3) text = "It's a draw.";
+    else if (outcome === 1) text = myMark(room) === 0 ? 'You win!' : 'X wins!';
+    else if (outcome === 2) text = myMark(room) === 1 ? 'You win!' : 'O wins!';
+    if (rematchRequested) text += ' Waiting for opponent…';
+    statusEl.textContent = text;
     rematchBtn.hidden = false;
+    rematchBtn.disabled = rematchRequested;
+    rematchBtn.textContent = rematchRequested ? 'Waiting…' : 'Rematch';
+    errorEl.hidden = true;
   } else {
     statusEl.textContent = 'Room closed.';
     rematchBtn.hidden = true;
+    hideRematch();
     cells.forEach(c => c.disabled = true);
+    drawWinLine(null);
   }
-}
-
-function sameId(a, b) { return String(a || '').toLowerCase() === String(b || '').toLowerCase(); }
-function myMark(room) { return sameId(room.playerXId, myId) ? 0 : 1; }
-function isMyTurn(room) {
-  const turn = room.turn === 0 ? 0 : 1;
-  return turn === myMark(room);
 }
 
 boardEl.addEventListener('click', async (e) => {
@@ -86,8 +147,14 @@ boardEl.addEventListener('click', async (e) => {
   }
 });
 
-leaveBtn.addEventListener('click', async () => {
-  if (!confirm('Leave counts as a loss. Continue?')) return;
+leaveBtn.addEventListener('click', () => { leaveModal.hidden = false; btnLeaveCancel.focus(); });
+btnLeaveCancel.addEventListener('click', () => { leaveModal.hidden = true; });
+leaveModal.addEventListener('click', (e) => { if (e.target === leaveModal) leaveModal.hidden = true; });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { leaveModal.hidden = true; }
+});
+btnLeaveConfirm.addEventListener('click', async () => {
+  leaveModal.hidden = true;
   await hubConn.invoke('Leave', roomId);
   window.location.href = '/';
 });
@@ -95,10 +162,23 @@ leaveBtn.addEventListener('click', async () => {
 rematchBtn.addEventListener('click', async () => {
   rematchBtn.disabled = true;
   const res = await hubConn.invoke('RequestRematch', roomId);
-  if (res?.error && res.error.code !== 'Game.AlreadyOver') toast(res.error.message || 'Rematch not ready.', 'info');
-  if (res?.value) render(res.value);
-  rematchBtn.disabled = false;
+  if (res?.error) {
+    if (res.error.code === 'Game.AlreadyOver') { rematchRequested = true; showRematch('Rematch requested — waiting for opponent…'); render(state); }
+    else toast(res.error.message || 'Rematch not ready.', 'info');
+  } else if (res?.value) {
+    if (statusOf(res.value) === 'Playing') { rematchRequested = false; render(res.value); }
+    else { rematchRequested = true; showRematch('Rematch requested — waiting for opponent…'); render(res.value); }
+  }
+  rematchBtn.disabled = rematchRequested;
 });
+
+btnLeftHome.addEventListener('click', () => { window.location.href = '/'; });
+function showLeftModal(msg) {
+  document.querySelector('#left-modal p').textContent = msg || 'Opponent left the game. You win!';
+  leftModal.hidden = false; btnLeftHome.focus();
+}
+function showRematch(msg) { rematchStatus.hidden = false; rematchText.textContent = msg; }
+function hideRematch() { rematchStatus.hidden = true; }
 
 function startGrace(secondsLeft) {
   let left = Number(secondsLeft) || 60;

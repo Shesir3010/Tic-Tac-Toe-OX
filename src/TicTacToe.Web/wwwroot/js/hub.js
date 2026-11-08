@@ -225,8 +225,11 @@ conn.on('InvitationAccepted', (p) => {
   hidePopup();
   const room = p?.room;
   if (room?.id) {
-    if (!location.pathname.startsWith('/Rooms/')) {
-      location.href = `/Rooms/${room.id}`;
+    // Always jump to the fresh room — even if we're already sitting in an old
+    // Finished room (re-invite after a quit/finish), otherwise we stay on stale board.
+    const expected = `/Rooms/${room.id}`;
+    if (location.pathname !== expected) {
+      location.href = expected;
     }
   } else {
     showRoomStatus('Invitation accepted! Room created.');

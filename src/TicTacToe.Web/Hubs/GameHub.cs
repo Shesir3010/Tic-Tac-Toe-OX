@@ -102,9 +102,21 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
     public async Task<OperationResult<RoomState>> RequestRematch(Guid roomId)
     {
         var result = await mediator.SendAsync(new RequestRematchCommand(roomId));
-        if (result.IsSuccess && result.Value is not null && result.Value.Status.ToString() == "Playing")
+        if (result.IsSuccess && result.Value is not null)
         {
-            await Clients.Group($"room-{roomId}").SendAsync("RematchStarted", new { room = result.Value });
+            if (result.Value.Status.ToString() == "Playing")
+            {
+                await Clients.Group($"room-{roomId}").SendAsync("RematchStarted", new { room = result.Value });
+            }
+            else
+            {
+                // Single-side request → notify only the other participant.
+                var me = Guid.TryParse(Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var uid) ? uid : (Guid?)null;
+                var other = me.HasValue && result.Value.PlayerXId == me.Value ? result.Value.PlayerOId : result.Value.PlayerXId;
+                await Clients.User(other.ToString()).SendAsync(
+                    "RematchRequested",
+                    new { roomId = roomId.ToString(), byName = Context.User?.Identity?.Name });
+            }
         }
         return result;
     }

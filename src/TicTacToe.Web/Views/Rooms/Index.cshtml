@@ -2,11 +2,20 @@
 @model TicTacToe.Domain.DTOs.Rooms.RoomState
 @{
     ViewData["Title"] = "Online game";
+    var myId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+    var isX = string.Equals(myId, Model.PlayerXId.ToString(), StringComparison.OrdinalIgnoreCase);
 }
 <meta name="ttt:room-id" content="@Model.Id" />
+<meta name="ttt:my-mark" content="@(isX ? "X" : "O")" />
 <div class="ttt-game" style="max-width:560px;margin:2rem auto;text-align:center">
-    <p class="ttt-status" id="room-status">Connecting…</p>
+    <div class="ttt-room-head" aria-label="Players">
+        <span class="ttt-room-side @(isX ? "is-you" : "")"><span class="ttt-mark-x">X</span> You</span>
+        <span class="ttt-room-vs">vs</span>
+        <span class="ttt-room-side @(!isX ? "is-you" : "")"><span class="ttt-mark-o">O</span> Opponent</span>
+    </div>
+    <p class="ttt-status" id="room-status" aria-live="polite">@(isX ? "Your turn as X" : "Opponent's turn")</p>
     <p id="grace-banner" class="alert alert-warning" hidden>Opponent disconnected — reconnecting in <strong id="grace-seconds">60</strong>s…</p>
+    <p id="rematch-status" class="ttt-invite-status" hidden aria-live="polite"><strong id="rematch-status-text"></strong></p>
     <p id="room-error" class="text-danger" hidden></p>
     <div id="board" class="ttt-board" role="grid" aria-label="Online game board">
         @for (int i = 0; i < 9; i++)
@@ -17,6 +26,27 @@
     <div class="ttt-actions">
         <button type="button" id="btn-leave" class="btn btn-outline-secondary">Leave game</button>
         <button type="button" id="btn-rematch" class="btn btn-outline-primary" hidden>Rematch</button>
+    </div>
+</div>
+
+<div id="leave-modal" class="ttt-modal-backdrop" hidden>
+    <div class="ttt-modal-card" role="dialog" aria-modal="true" aria-labelledby="leave-title">
+        <h3 id="leave-title">Leave this game?</h3>
+        <p>Leaving counts as a loss. The opponent wins and both results will be saved.</p>
+        <div class="ttt-modal-actions">
+            <button type="button" id="btn-leave-cancel" class="btn btn-outline-secondary">Stay</button>
+            <button type="button" id="btn-leave-confirm" class="btn btn-primary">Leave</button>
+        </div>
+    </div>
+</div>
+
+<div id="left-modal" class="ttt-modal-backdrop" hidden>
+    <div class="ttt-modal-card" role="dialog" aria-modal="true" aria-labelledby="left-title">
+        <h3 id="left-title">Opponent left</h3>
+        <p>Your opponent left the game. You win!</p>
+        <div class="ttt-modal-actions">
+            <button type="button" id="btn-left-home" class="btn btn-primary">Back to home</button>
+        </div>
     </div>
 </div>
 
