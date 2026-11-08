@@ -4,19 +4,31 @@ const conn = new signalR.HubConnectionBuilder()
   .withAutomaticReconnect({ nextRetryDelayInMilliseconds: 1000 })
   .build();
 
+function initials(name) {
+  return (name || '?').trim().slice(0, 2).toUpperCase();
+}
+
 function renderOnline(players) {
   const list = document.getElementById('online-list');
+  const count = document.getElementById('lobby-count');
   if (!list) return;
   list.innerHTML = '';
-  (players || []).forEach(p => {
+  const arr = players || [];
+  if (count) count.textContent = `${arr.length} online`;
+  arr.forEach(p => {
     const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between';
+    li.className = 'ttt-player';
+    const av = document.createElement('span');
+    av.className = 'ttt-avatar';
+    av.textContent = initials(p.displayName);
+    av.setAttribute('aria-hidden', 'true');
     const name = document.createElement('span');
+    name.className = 'ttt-player-name';
     name.textContent = p.displayName;
     const status = document.createElement('span');
-    status.className = 'badge bg-success';
+    status.className = 'ttt-badge-status';
     status.textContent = 'Available';
-    li.append(name, status);
+    li.append(av, name, status);
     list.appendChild(li);
   });
 }

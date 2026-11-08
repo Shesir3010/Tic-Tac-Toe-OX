@@ -4,64 +4,71 @@
 }
 
 <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
-<div class="ttt-game">
-    @if (User.Identity?.IsAuthenticated != true)
-    {
-        <div class="alert alert-info d-flex justify-content-between align-items-center" role="note">
-            <span>Playing as guest — results are stored only in this session.</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
-        </div>
-    }
-    <div class="ttt-panel">
-        <div class="ttt-segmented" role="group" aria-label="Game mode">
-            <button type="button" id="mode-local" class="is-active" aria-pressed="true">Local</button>
-            <button type="button" id="mode-computer" class="is-active" aria-pressed="false">Vs Computer</button>
-        </div>
-
-        <div class="ttt-difficulty" id="difficulty-group" role="group" aria-label="Computer difficulty" hidden>
-            <button type="button" class="is-active" data-difficulty="0" aria-pressed="true">Easy</button>
-            <button type="button" data-difficulty="1" aria-pressed="false">Medium</button>
-            <button type="button" data-difficulty="2" aria-pressed="false">Hard</button>
-        </div>
-    </div>
-
-    <div class="ttt-scoreboard" aria-live="polite">
-        <div class="ttt-score"><span class="ttt-mark-x">X</span><strong id="score-x">0</strong></div>
-        <div class="ttt-score"><span class="ttt-draws-label">Draws</span><strong id="score-draws">0</strong></div>
-        <div class="ttt-score"><span class="ttt-mark-o">O</span><strong id="score-o">0</strong></div>
-    </div>
-
-    <p id="status" class="ttt-status" aria-live="polite">X's turn</p>
-    <p id="error" class="text-danger" hidden></p>
-
-    <div id="board" class="ttt-board" role="grid" aria-label="Game board">
-        @for (int i = 0; i < 9; i++)
+<div class="ttt-home">
+    <div class="ttt-game">
+        @if (User.Identity?.IsAuthenticated != true)
         {
-            <button type="button" class="ttt-cell" data-index="@i" role="gridcell" aria-label="Row @(i / 3 + 1), column @(i % 3 + 1), empty"></button>
+            <div class="alert alert-info d-flex justify-content-between align-items-center" role="note">
+                <span>Playing as guest — results are stored only in this session.</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
+            </div>
         }
+        <div class="ttt-panel">
+            <div class="ttt-segmented" role="group" aria-label="Game mode">
+                <button type="button" id="mode-local" class="is-active" aria-pressed="true">Local</button>
+                <button type="button" id="mode-computer" class="is-active" aria-pressed="false">Vs Computer</button>
+            </div>
+
+            <div class="ttt-difficulty" id="difficulty-group" role="group" aria-label="Computer difficulty" hidden>
+                <button type="button" class="is-active" data-difficulty="0" aria-pressed="true">Easy</button>
+                <button type="button" data-difficulty="1" aria-pressed="false">Medium</button>
+                <button type="button" data-difficulty="2" aria-pressed="false">Hard</button>
+            </div>
+        </div>
+
+        <div class="ttt-scoreboard" aria-live="polite">
+            <div class="ttt-score"><span class="ttt-mark-x">X</span><strong id="score-x">0</strong></div>
+            <div class="ttt-score"><span class="ttt-draws-label">Draws</span><strong id="score-draws">0</strong></div>
+            <div class="ttt-score"><span class="ttt-mark-o">O</span><strong id="score-o">0</strong></div>
+        </div>
+
+        <p id="status" class="ttt-status" aria-live="polite">X's turn</p>
+        <p id="error" class="text-danger" hidden></p>
+
+        <div id="board" class="ttt-board" role="grid" aria-label="Game board">
+            @for (int i = 0; i < 9; i++)
+            {
+                <button type="button" class="ttt-cell" data-index="@i" role="gridcell" aria-label="Row @(i / 3 + 1), column @(i % 3 + 1), empty"></button>
+            }
+        </div>
+
+        <div class="ttt-actions">
+            <button type="button" id="btn-reset" class="btn btn-outline-primary">Reset</button>
+            <button type="button" id="btn-new-match" class="btn btn-outline-secondary">New match</button>
+        </div>
+
+        <select id="mode" aria-hidden="true" tabindex="-1" hidden>
+            <option value="0">Local pass-and-play</option>
+            <option value="1">Vs computer</option>
+        </select>
+        <select id="difficulty" aria-hidden="true" tabindex="-1" hidden>
+            <option value="0">Easy</option>
+            <option value="1" selected>Medium</option>
+            <option value="2">Hard</option>
+        </select>
+
+        @Html.AntiForgeryToken()
     </div>
 
-    <div class="ttt-actions">
-        <button type="button" id="btn-reset" class="btn btn-outline-primary">Reset</button>
-        <button type="button" id="btn-new-match" class="btn btn-outline-secondary">New match</button>
-    </div>
-
-    <section id="lobby" aria-label="Online players">
-        <h2>Online players</h2>
-        <ul id="online-list" class="list-group"></ul>
-    </section>
-
-    <select id="mode" aria-hidden="true" tabindex="-1" hidden>
-        <option value="0">Local pass-and-play</option>
-        <option value="1">Vs computer</option>
-    </select>
-    <select id="difficulty" aria-hidden="true" tabindex="-1" hidden>
-        <option value="0">Easy</option>
-        <option value="1" selected>Medium</option>
-        <option value="2">Hard</option>
-    </select>
-
-    @Html.AntiForgeryToken()
+    <aside id="lobby" class="ttt-lobby" aria-label="Online players">
+        <div class="ttt-lobby-head">
+            <span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>
+            <h2>Online players</h2>
+            <span id="lobby-count" class="ttt-lobby-count" aria-live="polite">0 online</span>
+        </div>
+        <p class="ttt-lobby-sub">Find someone to play right now.</p>
+        <ul id="online-list" class="ttt-lobby-list"></ul>
+    </aside>
 </div>
 
 @section Scripts {

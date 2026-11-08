@@ -96,7 +96,22 @@ body { margin-bottom: 60px; }
 .form-floating > .form-control:focus::placeholder { text-align: start; }
 
 /* Tic Tac Toe board (M3 local pass-and-play) */
-.ttt-game { max-width: 560px; margin: 2rem auto; text-align: center; }
+.ttt-home { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 1140px; margin: 2rem auto; align-items: start; }
+@media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(0, 560px) minmax(280px, 340px); } }
+.ttt-lobby { background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }
+.ttt-lobby-head { display: flex; align-items: center; gap: 10px; }
+.ttt-lobby-head h2 { font-size: 1.25rem; margin: 0; color: var(--ttt-text-primary); }
+.ttt-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ttt-success); box-shadow: 0 0 10px var(--ttt-success); }
+.ttt-dot-live { animation: tttBadgePulse 2s var(--ttt-ease-in-out) infinite; }
+.ttt-lobby-count { margin-left: auto; font-size: .85rem; color: var(--ttt-text-muted); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-pill); padding: 2px 10px; }
+.ttt-lobby-sub { color: var(--ttt-text-muted); font-size: .9rem; margin: 6px 0 12px; }
+.ttt-lobby-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ttt-lobby-list:empty::after { content: "No one else is online right now."; color: var(--ttt-text-muted); font-size: .9rem; }
+.ttt-player { display: flex; align-items: center; gap: 10px; background: var(--ttt-surface); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-control); padding: 10px 12px; }
+.ttt-avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgb(99 102 241 / .18); color: var(--ttt-primary-hover); font-weight: 800; flex: 0 0 auto; }
+.ttt-player-name { color: var(--ttt-text-primary); font-weight: 600; }
+.ttt-badge-status { margin-left: auto; border-radius: var(--ttt-radius-pill); padding: 2px 10px; font-size: .8rem; font-weight: 700; background: rgb(16 185 129 / .15); color: var(--ttt-success); border: 1px solid rgb(16 185 129 / .35); }
+.ttt-game { max-width: 560px; margin: 0 auto; width: 100%; text-align: center; }
 .ttt-panel { display: grid; gap: 10px; justify-items: center; margin-bottom: 16px; }
 .ttt-segmented, .ttt-difficulty {
   display: inline-flex; padding: 4px; gap: 4px;
