@@ -6,9 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicTacToe.Application;
+using TicTacToe.Application.Contracts;
+using TicTacToe.Application.Contracts.Repositories;
 using TicTacToe.Application.Contracts.Services;
 using TicTacToe.Domain.Contracts;
 using TicTacToe.Infrastructure.Data;
+using TicTacToe.Infrastructure.Data.Repositories;
 using TicTacToe.Infrastructure.Identity;
 using TicTacToe.Infrastructure.Services;
 
@@ -29,6 +32,10 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IRandomSource, SystemRandomSource>();
         services.AddScoped<IComputerPlayerFactory, ComputerPlayerFactory>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {

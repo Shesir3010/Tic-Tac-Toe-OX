@@ -77,11 +77,13 @@
 
 ## M5 — Save & forgery proof
 
-- [ ] `Matches` table + migrations (Mode, Difficulty, Symbol, Result, Moves, UTC)
-- [ ] `SaveMatchCommand` — **server replays** the move list, verifies legality + result
-- [ ] Forged/tampered result → `Game.ForgedResult`, row **not** written
-- [ ] Honest save writes exactly one row (insert-once)
-- [ ] W-11 passed (forgery probe)
+- [x] `Matches` table + migrations (Mode, Difficulty, Symbol, Result, Moves, UTC)
+- [x] `SaveMatchCommand` — **server replays** the move list, verifies legality + result
+- [x] Forged/tampered result → `Game.ForgedResult`, row **not** written
+- [x] Honest save writes exactly one row (insert-once)
+- [x] W-11 passed (forgery probe)
+
+**Evidence (M5 closed 2026-11-08):** `Matches` migration `20261108120613_AddMatches` on Express 2025 (UserId Cascade, Opponent NoAction for SQL 1785; M12 nulls explicitly) · build Release 0 warnings 0 errors · `dotnet test` 102/102 (7 new SaveMatch incl. honest 1-row / tampered / illegal / unfinished / guest / difficulty / draw) · W-M5 walkthrough.
 
 ## M6 — History & stats pages
 
