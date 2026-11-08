@@ -1,3 +1,5 @@
+using TicTacToe.Domain.Engine;
+
 namespace TicTacToe.Domain.Engine.Ai;
 
 /// <summary>One computer difficulty. OCP: new difficulty = new class + one factory entry.</summary>
