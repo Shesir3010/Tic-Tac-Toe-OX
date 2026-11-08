@@ -115,17 +115,9 @@ body { margin-bottom: 60px; }
 .btn-outline-primary, .btn-outline-secondary { border-radius: var(--ttt-radius-pill); }
 .btn-outline-primary { border-color: var(--ttt-primary); color: var(--ttt-primary-hover); }
 .btn-outline-secondary { border-color: var(--ttt-border-strong); color: var(--ttt-text-secondary); }
-.ttt-home { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 1040px; margin: 1.5rem auto; align-items: start; padding: 0 16px; }
-@media (min-width: 1024px) { .ttt-home { grid-template-columns: 320px 520px; gap: 16px 32px; justify-content: center; } }
-.ttt-left { display: grid; gap: 12px; align-content: start; min-width: 0; }
-.ttt-userbox { align-self: start; width: 320px; display: flex; align-items: center; gap: 12px;
+.ttt-home { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 1140px; margin: 2rem auto; align-items: start; }
+@media (min-width: 1024px) { .ttt-home { grid-template-columns: minmax(280px, 340px) minmax(0, 560px); gap: 80px; justify-content: center; } }
 .ttt-lobby { background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 16px; box-shadow: var(--ttt-shadow-card); }
-.ttt-userbox { grid-column: 1; align-self: start; width: 320px; display: flex; align-items: center; gap: 12px; background: linear-gradient(180deg, var(--ttt-surface), var(--ttt-surface-raised)); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 12px 14px; box-shadow: var(--ttt-shadow-card); }
-.ttt-user-meta { flex: 1; min-width: 0; }
-.ttt-user-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.ttt-user-online { display: inline-flex; align-items: center; gap: 6px; color: var(--ttt-success); font-size: .82rem; font-weight: 700; }
-.ttt-user-stats { display: grid; gap: 2px; margin-top: 6px; color: var(--ttt-text-muted); font-size: .88rem; }
-.ttt-user-stats strong { color: var(--ttt-text-primary); font-family: var(--ttt-font-mono); }
 .ttt-lobby-head { display: flex; align-items: center; gap: 10px; }
 .ttt-lobby-head h2 { font-size: 1.25rem; margin: 0; color: var(--ttt-text-primary); }
 .ttt-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ttt-success); box-shadow: 0 0 10px var(--ttt-success); }

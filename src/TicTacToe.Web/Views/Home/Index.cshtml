@@ -4,15 +4,7 @@
 }
 
 <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
-@if (User.Identity?.IsAuthenticated != true)
-{
-    <div class="alert alert-info d-flex justify-content-between align-items-center ttt-guest-notice" role="note">
-        <span>Playing as guest — results are stored only in this session.</span>
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
-    </div>
-}
 <div class="ttt-home">
-    <div class="ttt-left">
     <aside id="lobby" class="ttt-lobby" aria-label="Online players">
         <div class="ttt-lobby-head">
             <span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>
@@ -23,7 +15,6 @@
         <p id="waiting-card" class="ttt-waiting" hidden>Waiting for <span id="waiting-name"></span>… <button type="button" id="btn-cancel-invite" class="btn btn-sm btn-outline-secondary">Cancel</button></p>
         <ul id="online-list" class="ttt-lobby-list"></ul>
     </aside>
-    </div>
 
     <div id="invite-popup" class="modal" tabindex="-1" hidden role="dialog" aria-modal="true" aria-labelledby="popup-title">
         <div class="modal-dialog">
@@ -36,6 +27,13 @@
     </div>
 
     <div class="ttt-game">
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <div class="alert alert-info d-flex justify-content-between align-items-center" role="note">
+                <span>Playing as guest — results are stored only in this session.</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert" aria-label="Dismiss">×</button>
+            </div>
+        }
         <div class="ttt-panel">
             <div class="ttt-segmented" role="group" aria-label="Game mode">
                 <button type="button" id="mode-local" class="is-active" aria-pressed="true">Local</button>
