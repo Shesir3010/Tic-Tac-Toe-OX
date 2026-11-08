@@ -67,7 +67,7 @@ Anything below is out of scope for v1 — proposals are recorded and rejected fo
 
 | Mode | Target user | Tech surface | Saves |
 | --- | --- | --- | --- |
-| Local pass-and-play (X vs O on one device) | Sara | Game page, JS + server engine | Logged in: match row via `POST /api/matches` · guest: session score only |
+| Local pass-and-play (X vs O on one device) | Sara | Game page, JS + server engine | Logged in: match row via Razor POST (`SaveMatchCommand`) · guest: session score only |
 | Vs Computer (Easy / Medium / Hard) | Sara, Rafi | Same page; server engine computes reply | Same as local |
 | Online by invitation | Rafi + his friend | Presence list, in-page invite popup, SignalR room | Both players get one match row each, in one transaction |
 
@@ -203,7 +203,8 @@ v1.0 is *done* when all of the following hold:
 | 2026-11-06 | v1.0 set frozen as FR-01…FR-31 / US-01…US-14, consolidated from the original docs; FR-12 downgraded to Could; M7 redefined as the verification sweep in [`roadmap.md`](roadmap.md) |
 | 2026-11-07 | **Invitations replace room codes.** FR-23/FR-24 superseded by new FR-32…FR-36; FR-30 amended (no idle-room expiry, orphan-room rule); US-09/US-10 superseded by new US-15…US-17 in [`user-stories.md`](user-stories.md); §2.3 and §4.3 rewritten; two decisions recorded (site-wide presence; invitations-only) in [`../01-architecture/adr/0009-invitations-replace-room-codes.md`](../01-architecture/adr/0009-invitations-replace-room-codes.md) |
 | 2026-11-07 | **Testing suites reduced to unit + E2E** (owner decision): the standalone integration-test project (`WebApplicationFactory` + SignalR client) is removed from the plan; its coverage was reassigned — endpoint/auth/anti-forgery/error-copy checks moved to E2E, handler-transaction guarantees to unit tests ([`../01-architecture/adr/0008-nunit-moq-shouldly-testing.md`](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md)); milestone exit criteria reworded in [`roadmap.md`](roadmap.md) |
-| 2026-11-07 | **Testing reduced to unit only** (owner decision): the E2E/Playwright suite is withdrawn as well; real-server guarantees (auth matrix, anti-forgery, error-copy rendering, hub race manifestations, presence updates) move to documented **manual walkthrough scripts** executed at milestone gates and the M7 sweep ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md) §consequences); success metric 4 reworded to unit-level exactly-once semantics |
+| 2026-11-07 | **Testing reduced to unit only** (owner decision): the E2E/Playwright suite is withdrawn as well; real-server guarantees (auth matrix, anti-forgery, error-copy rendering, hub race manifestations, presence updates) move to documented **manual walkthrough scripts** executed at milestone gates and the M13 sweep ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md) §consequences); success metric 4 reworded to unit-level exactly-once semantics |
+| 2026-11-08 | **Doc sync (owner decisions):** milestones standardized to **M0–M13** (sweep = M13); `/` = Game page for all (guests + signed-in); `/Settings` is **public** (browser-only, FR-22); `SaveMatchCommand` transported via **Razor POST** (single JSON endpoint stays `POST /api/game/move`); `PlayMove` standardized to **`PlayMoveCommand`** (not Query); **`UserName` is the display name** (no separate `DisplayName` column, regex `^[A-Za-z0-9_]{3,20}$`); board renders **wait-for-server** with no optimistic render; walkthrough results recorded in `docs/project_documentations/walkthroughs/` |
 
 ## Assumptions
 

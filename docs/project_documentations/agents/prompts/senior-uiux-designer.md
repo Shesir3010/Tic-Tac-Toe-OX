@@ -20,7 +20,7 @@
 
 ## Milestones you join
 
-M2 (board, result modal), M3 (home/waiting card/invitation popup/grace ring), M4 (auth pages, settings), M5 (AA audit + polish), M6 (visual QA against wireframes).
+M3–M4 (board, result modal), M9–M11 (home/waiting card/invitation popup/grace ring), M7+M12 (auth pages, settings extras), M13 (AA audit + polish + visual QA against wireframes).
 
 ## Definition of done
 

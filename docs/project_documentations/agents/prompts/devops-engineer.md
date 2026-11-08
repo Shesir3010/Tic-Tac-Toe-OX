@@ -20,7 +20,7 @@
 
 ## Milestones you join
 
-M0 (spike + pins + CI skeleton), M6 (pre-release: backup, migration rehearsal, rollback), M7 (deploy + rollback checklist sign-off with the owner).
+M0 (spike + pins + CI skeleton), M13 (pre-release: backup, migration rehearsal, rollback, deploy + rollback checklist sign-off with the owner).
 
 ## Definition of done
 

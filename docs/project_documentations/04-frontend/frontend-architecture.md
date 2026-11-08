@@ -54,7 +54,8 @@ wwwroot/
 | **Transport dumb** | `hub.js` only connects + listens; every screen module subscribes and renders. No hub logic in views or `board.js` |
 | **One module, one job** | Presence list code lives only in `lobby.js`; board rendering only in `board.js`; sounds only in `sound.js` |
 | **Messages come from the catalog** | Frontend copies come verbatim from `02-backend/error-handling.md` — the client never invents error wording |
-| **Server wins ties** | If a broadcast and an optimistic render disagree, the broadcast is discarded and the next `RoomState` replaces the board |
+| **Server wins ties** | The board waits for the server and the returned `RoomState` replaces local state wholesale; no optimistic render is kept |
+| **Sound settings** | Web Audio toggles persist in the browser (`localStorage`), work for guests, and need no server round-trip (Settings is public, FR-22) |
 
 ## 4. Hub connection ownership
 
@@ -99,7 +100,7 @@ wwwroot/
 | `lose` | loss | falling tone, 1 s |
 | `toggle` | Settings switches (sound/theme) | < 0.2 s click |
 
-All tones are **synthesized with the Web Audio API** — no audio files, no libraries, zero licensing. Volume is fixed (no volume slider in v1 — only on/off); sound is on/off and persists per user (Settings). Sounds play only after first user interaction (browser autoplay policy). Missing sounds degrade to silence — never a broken page.
+All tones are **synthesized with the Web Audio API** — no audio files, no libraries, zero licensing. Volume is fixed (no volume slider in v1 — only on/off); sound is on/off and persists in the browser per user (Settings, `localStorage`). Sounds play only after first user interaction (browser autoplay policy). Missing sounds degrade to silence — never a broken page.
 
 ## Assumptions
 

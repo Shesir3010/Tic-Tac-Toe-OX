@@ -50,7 +50,7 @@
 ## M3 — Local pass-and-play
 
 - [ ] `Game/Web` page renders server `RoomState`-equivalent board (stateless: browser sends board + move)
-- [ ] `PlayMoveQuery` + `POST /api/game/move` (server validates via engine)
+- [ ] `PlayMoveCommand` + `POST /api/game/move` (server validates via engine)
 - [ ] Winning-line highlight + status text (game state, not just code)
 - [ ] Reset (keeps scoreboard) + New match (zeroes scoreboard)
 - [ ] Session scoreboard (X / Draws / O) tracked incl. guests

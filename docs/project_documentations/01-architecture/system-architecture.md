@@ -93,7 +93,7 @@ TicTacToe/
    └─ TicTacToe.Application.UnitTests/  (the only suite — mirrors Domain/Engine + Application/Features; mocked contracts, fake TimeProvider, no server)
 ```
 
-> **Unit-only testing (owner decision, 2026-11-07):** there is deliberately **no** integration suite and **no** E2E/Playwright suite. Handler/store/invitation guarantees are unit-tested against mocked contracts; real-server behaviour (cookie auth redirects, hub negotiate, error-copy rendering, two-player race manifestations) is verified by **documented manual walkthrough scripts** executed at milestone gates and during the M7 sweep. Re-introducing automated suites later is an owner decision recorded with a new ADR.
+> **Unit-only testing (owner decision, 2026-11-07):** there is deliberately **no** integration suite and **no** E2E/Playwright suite. Handler/store/invitation guarantees are unit-tested against mocked contracts; real-server behaviour (cookie auth redirects, hub negotiate, error-copy rendering, two-player race manifestations) is verified by **documented manual walkthrough scripts** executed at milestone gates and during the M13 sweep. Re-introducing automated suites later is an owner decision recorded with a new ADR.
 
 **CQRS folder convention (owner standard, 2026-11-08):** `Features/{Area}/{Feature}/Command/` holds `XxxCommand.cs` + `XxxCommandHandler.cs` (the write side); `Features/{Area}/{Feature}/Query/` holds `GetXxxQuery.cs` + `GetXxxQueryHandler.cs` (the read side). A reviewer finds any behaviour by area → feature in two clicks.
 

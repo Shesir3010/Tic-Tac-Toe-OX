@@ -10,13 +10,13 @@ Parent document: [PRD](../00-product/PRD.md) §5 · Related: [UX/UI Design Syste
 
 | Route (controller action) | Page | Access | Guard |
 | --- | --- | --- | --- |
-| `/` (guest) | Landing | Public | Redirects signed-in users to `/Home` |
-| `/Account/Login` | Login | Public | Guest only (signed-in → `/Home`) |
-| `/Account/Register` | Register | Public | Guest only |
+| `/` | Game (local + vs computer) | Public | — (guests and signed-in all open the game here) |
+| `/Account/Login` | Login | Public | Guest only (signed-in → `/`) |
+| `/Account/Register` | Register | Public | Guest only (signed-in → `/`) |
 | `/Home` | Home (online list + mode select) | Authenticated | Server `[Authorize]` |
 | `/Rooms/{id}` | Room game | Authenticated + participant | Server checks room membership; non-players → 404 |
 | `/History` | History + stats | Authenticated | Server `[Authorize]` |
-| `/Settings` | Settings (sound, theme) | Authenticated | Server `[Authorize]` |
+| `/Settings` | Settings (sound, theme) | Public | — (browser-only, guests included per FR-22) |
 | `/Account` | Profile (change password, delete account) | Authenticated | Server `[Authorize]` |
 | `*` | Not Found | Public | none |
 
@@ -204,7 +204,7 @@ Click **Invite** → `SendInvitationCommand` (hub `InvitePlayer`) → waiting ca
 
 ### 5.4 Move interaction detail
 
-Click cell → optimistic mark render (mark draw animation) → server `MakeOnlineMove` resolves → authoritative `RoomState` replaces the board (never merges) → on `Game.AlreadyOver`/illegal, cell shakes 300 ms + error toast with the exact message from `error-handling.md`.
+Click cell → board waits for the server → authoritative `RoomState` replaces the board (never merges) and the mark-draw animation plays → on `Game.AlreadyOver`/illegal, cell shakes 300 ms + error toast with the exact message from `error-handling.md`.
 
 ### 5.5 Result modal
 
@@ -222,7 +222,7 @@ Desktop: stat chips row (Played / Won / Lost / Win %) + table (result badge, opp
 
 ## 7. Settings (`/Settings`) + Profile (`/Account`)
 
-- **Settings:** sound on/off (Web-Audio synthesized — no audio files), theme toggle (`data-bs-theme` dark/light, persisted), reduced-motion note. Saved per user.
+- **Settings:** sound on/off (Web-Audio synthesized — no audio files), theme toggle (`data-bs-theme` dark/light, persisted in the browser via `localStorage`, no server round-trip), reduced-motion note. Works for guests (FR-22).
 - **Profile:** change-password form (current + new, per-field errors), delete-account danger zone: warning card → confirm modal (type-your-username to enable Delete) → on success, signed out + toast.
 
 ## 8. Not Found
@@ -236,7 +236,7 @@ Desktop: stat chips row (Played / Won / Lost / Win %) + table (result badge, opp
 ### 9.1 Visitor → Register → Home (US-01, FR-01…FR-05)
 
 ```
-Visitor opens / → Landing (guest)
+Visitor opens / → Game page (local + vs computer)
   → Register (username/email/password/confirm, strength meter, duplicate errors inline)
   → success → /Home, toast "Account created — welcome!", presence connects
 ```

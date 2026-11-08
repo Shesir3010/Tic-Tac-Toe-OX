@@ -22,7 +22,7 @@
 
 ## Milestones you join
 
-M0 (solution + pins), M1 (engine), M3 (hub/locks/invitation state trio), M5 (hardening), M7 (final architecture verification).
+M0 (solution + pins), M1 (engine), M9–M11 (presence, invitations, rooms incl. hub/locks/invitation state trio), M13 (final architecture verification).
 
 ## Definition of done
 

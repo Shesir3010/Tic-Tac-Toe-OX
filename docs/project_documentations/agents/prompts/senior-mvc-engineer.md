@@ -20,7 +20,7 @@
 
 ## Milestones you join
 
-M0 (shell + tokens), M2 (mode select + board + History/Settings), M3 (home list, waiting card, popup, room page), M4 (auth pages + settings), M5 (a11y/polish), M6 (wireframe QA).
+M0 (shell + tokens), M3–M4 (mode select + board), M6 (History), M9–M11 (home list, waiting card, popup, room page), M7+M12 (auth pages + settings extras), M13 (a11y/polish + wireframe QA).
 
 ## Definition of done
 

@@ -8,7 +8,7 @@ Parent document: [PRD](../00-product/PRD.md) · Related: [Test Strategy](test-st
 
 ## 1. Unit inventory (the automated floor)
 
-Every row below is a green-unit-test obligation of the milestone it belongs to (roadmap M0–M7). "Fake time" = injected `TimeProvider`; "Substitute" = Moq `Verify`.
+Every row below is a green-unit-test obligation of the milestone it belongs to (roadmap M0–M13). "Fake time" = injected `TimeProvider`; "Substitute" = Moq `Verify`.
 
 | # | Use case / area | Tests (happy + unhappy) |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ Unit tests prove the *decisions*; these scripts prove the *real-server manifesta
 
 ## 3. Manual walkthrough scripts (the E2E replacements)
 
-Each script is executed at every milestone gate and during the M7 sweep; **results are recorded (script id, date, pass/fail) — an unrecorded script counts as not passed** ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md)):
+Each script is executed at every milestone gate and during the M13 sweep; **results are recorded (script id, date, pass/fail) — an unrecorded script counts as not passed** ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md)):
 
 | # | Script | Covers |
 | --- | --- | --- |
@@ -55,21 +55,27 @@ Each script is executed at every milestone gate and during the M7 sweep; **resul
 | W-12 | Account: change password (wrong current), delete with active room | FR-19…FR-21 + W-7 |
 | W-13 | Hub negotiate + cookie persistence across pages; unauthorized access redirects | §8 security checklist items 1, 3, 6, 7 |
 
-## 4. Milestone gates (M0 → M7)
+## 4. Milestone gates (M0 → M13)
 
 | Milestone | Required evidence |
 | --- | --- |
 | **M0** spike | WebSockets alive on the host (`spikes/SignalRCheck` result recorded); stack pins committed |
 | **M1** engine | U-1 + U-14 green; engine 100% line coverage; architecture tests present |
-| **M2** offline | U-2, U-3, U-9 green; W-11 passed |
-| **M3** online | U-4…U-8, U-11…U-13 green; W-1…W-7 passed |
-| **M4** auth/polish | U-10 green; W-8, W-12, W-13 passed; security checklist §8 green |
-| **M5** hardening | All rows of §8 checklist re-verified after hardening changes |
-| **M6** pre-release | Full unit suite green; W-8…W-13 re-run after final config review |
-| **M7** verification sweep | Every script re-run against the final build; roadmap M7 exit criteria checked item by item |
+| **M2** AI | U-1 (AI legality + exhaustive Hard minimax sweep) green |
+| **M3** local | U-2 green; W-11 passed |
+| **M4** computer | U-2 green; W-11 passed |
+| **M5** save & forgery | U-3 green; W-11 passed |
+| **M6** history & stats | U-9 green; W-11 passed |
+| **M7** accounts | W-8 passed |
+| **M8** guests | W-11 (guest) passed |
+| **M9** presence | U-12 (presence part) green; live list observed in two browsers |
+| **M10** invitations | U-4, U-5, U-6, U-12 green; W-1, W-2, W-5, W-10 passed |
+| **M11** rooms | U-7, U-8, U-11, U-12, U-13 green; W-3, W-4, W-6, W-7, W-9 passed |
+| **M12** account extras | U-10 green; W-12 passed |
+| **M13** verification sweep | Every script (W-1…W-13) re-run against the final build; roadmap M13 exit criteria checked item by item |
 
 ## Assumptions
 
 - The unit inventory is closed for v1: a new use case adds its row here *and* its tests in the same change.
-- The concurrency walkthroughs (W-1…W-7) and the walkthrough scripts (W-8…W-13) are versioned with this file; a failed script blocks its milestone gate — there is no "run it later" state.
+- The concurrency walkthroughs (W-1…W-7) and the walkthrough scripts (W-8…W-13) are versioned with this file; results are recorded in `docs/project_documentations/walkthroughs/` (script id, date, browser, pass/fail) — a failed script blocks its milestone gate; there is no "run it later" state.
 - Real-server behaviour that cannot be unit-tested (cookie redirects, hub negotiate, error-copy rendering) is *only* covered by the scripts; an uncovered behaviour is a doc gap to record, not a test to skip silently.

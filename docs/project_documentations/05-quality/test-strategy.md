@@ -212,7 +212,7 @@ Gate: the engine must reach **100% line coverage** ([M1](../00-product/roadmap.m
 | `InvitationManager_ExpiryAndCooldown` | Fake `TimeProvider`: TTL fires once; cooldown re-arms after decline |
 | `RoomCleanupService_*` | Forfeit sweep, orphaned close without saves, expired invitations — each fake-time traveled |
 
-**Concurrency note:** the lock-based serialization (ADR-0013) is unit-tested per store/manager above with fake time; its real-connection manifestation is verified by the documented **manual two-browser walkthrough scripts** ([test-plan.md](test-plan.md) §concurrency), executed at milestone gates and the M7 sweep.
+**Concurrency note:** the lock-based serialization (ADR-0013) is unit-tested per store/manager above with fake time; its real-connection manifestation is verified by the documented **manual two-browser walkthrough scripts** ([test-plan.md](test-plan.md) §concurrency), executed at milestone gates and the M13 sweep.
 
 **Coverage checklist (per use case — no meaningless tests):** every slice covers (1) valid input + success, (2) invalid input, (3) missing data, (4) business-rule violations, (5) boundary conditions, (6) dependency interactions where relevant — expected business failures assert `OperationResult` codes, never exceptions.
 
@@ -226,7 +226,7 @@ Registration/login/account shapes (username rules, password policy, email shape)
 
 ## 8. Frontend (client)
 
-No automated client suite — deliberate (the client has no bundler and no build step). Frontend behaviour is verified by: the documented **manual walkthrough scripts** (login, invite accept/reject, two-browser races, disconnect/forfeit, delete-account-in-room — [test-plan.md](test-plan.md)), executed at every milestone gate and the **M7 verification sweep**; results are recorded — an unrecorded script counts as *not passed* ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md)). A client test harness (if ever needed) would arrive via a new ADR, never a silent add.
+No automated client suite — deliberate (the client has no bundler and no build step). Frontend behaviour is verified by: the documented **manual walkthrough scripts** (login, invite accept/reject, two-browser races, disconnect/forfeit, delete-account-in-room — [test-plan.md](test-plan.md)), executed at every milestone gate and the **M13 verification sweep**; results are recorded in `docs/project_documentations/walkthroughs/` (script id, date, browser, pass/fail) — an unrecorded script counts as *not passed* ([ADR-0008](../01-architecture/adr/0008-nunit-moq-shouldly-testing.md)). A client test harness (if ever needed) would arrive via a new ADR, never a silent add.
 
 ## 9. Definition of Done
 

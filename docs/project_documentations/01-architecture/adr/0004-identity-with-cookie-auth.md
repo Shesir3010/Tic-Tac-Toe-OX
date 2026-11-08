@@ -2,7 +2,7 @@
 
 *Why accounts use the framework's Identity system with its default cookie flow — and nothing fancier.*
 
-**Status:** Accepted (2026-11-06) · **Referenced by:** `../system-architecture.md` · `../../05-quality/security.md` §3.1–§3.2 · `../../00-product/PRD.md` (FR-14, FR-19, FR-20, FR-31)
+**Status:** Accepted (2026-11-06) · **Amended 2026-11-08:** `UserName` is the display name (no separate `DisplayName` column); username regex `^[A-Za-z0-9_]{3,20}$` enforced by validator — see [`schema-and-erd.md`](../../03-database/schema-and-erd.md) · **Referenced by:** `../system-architecture.md` · `../../05-quality/security.md` §3.1–§3.2 · `../../00-product/PRD.md` (FR-14, FR-19, FR-20, FR-31)
 
 ## Context
 
@@ -10,7 +10,7 @@ v1 needs: register/login/logout with no email step ([FR-14](../../00-product/PRD
 
 ## Decision
 
-1. **ASP.NET Core Identity** owns credentials: `ApplicationUser : IdentityUser<Guid>` plus a unique `DisplayName`; default hashing, lockout (5 attempts / 5 min), and the standard stores.
+1. **ASP.NET Core Identity** owns credentials: `ApplicationUser : IdentityUser<Guid>` where `UserName` **is** the display name (unique, shown in rooms/history, regex `^[A-Za-z0-9_]{3,20}$`); default hashing, lockout (5 attempts / 5 min), and the standard stores. No separate `DisplayName` column in v1.
 2. **Cookie authentication only** — the browser cookie is the sole credential for pages **and** the hub (SignalR negotiate uses the same cookie). No JWTs, no token-based flows.
 3. Login accepts **username or email**; duplication is rejected with inline per-field errors; wrong credentials produce exactly one generic message (never "email not found").
 4. No email confirmation, no email reset (no mail service → D-10); a forgotten password = create a new account until an email service lands.

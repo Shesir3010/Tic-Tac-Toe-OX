@@ -79,7 +79,7 @@ Boundary rules: nothing outside T2 speaks plaintext or reaches the database; the
 | --- | --- |
 | Password hashing | ASP.NET Core Identity `PasswordHasher` — PBKDF2 (HMAC-SHA-256), framework-default iteration count (≥ 100 000), per-password salt |
 | Password policy | Minimum 8 characters, at least one upper-case, one lower-case, one digit |
-| Uniqueness | Username unique (3–20 chars, `^[A-Za-z0-9_]+$`), email unique and valid, max 256 chars |
+| Uniqueness | Username unique (3–20 chars, `^[A-Za-z0-9_]{3,20}$`) — **this is the display name** (no separate `DisplayName` column, owner decision 2026-11-08); email unique and valid, max 256 chars |
 | Lockout | 5 failed attempts → locked 5 minutes (`LockoutEnabled`, `MaxFailedAccessAttempts = 5`, `LockoutTimeSpan = 5 min`); locked logins show `Auth.LockedOut` |
 | Passwords in transit | Only over HTTPS bodies; never in URLs, never logged |
 

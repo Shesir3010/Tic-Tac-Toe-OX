@@ -73,7 +73,7 @@ Two transports deliberately coexist ([ADR-0003](adr/0003-signalr-hub-as-command-
 | Transport | Serves | Why |
 | --- | --- | --- |
 | `GameHub` invocations | **Online** mutations (invitations/move/leave/rematch) + all broadcasts | Persistent authenticated connection; instant push both ways |
-| `POST /api/game/move` | **Local & vs-computer** moves (`PlayMoveQuery`) | Stateless single request; no hub connection needed offline |
+| `POST /api/game/move` | **Local & vs-computer** moves (`PlayMoveCommand`) | Stateless single request; no hub connection needed offline |
 
 Both funnel into the **same Cortex commands** — the hub contains zero rules, zero board logic.
 
@@ -201,7 +201,7 @@ Implemented in `RoomCleanupService` (5-second tick, fake-time testable, one try/
 
 | Metric | Budget | Where measured |
 | --- | --- | --- |
-| Move round-trip p95 (click → opponent board updated) | < 500 ms | Manual two-browser timing check (M4 gate, M7 sweep) |
+| Move round-trip p95 (click → opponent board updated) | < 500 ms | Manual two-browser timing check (M4 gate, M13 sweep) |
 | Opponent-move latency once `MoveApplied` fires (server → client paint) | < 100 ms typical | Manual two-browser timing |
 | Lock hold time per mutation | µs (no I/O inside locks except the orchestrated finish) | Store unit tests |
 | Connection count on free plan | ≥ 200 concurrent authenticated | M0 spike + load check |

@@ -27,7 +27,7 @@ All commands/queries are dispatched through `IMediator` — from the `GameHub` f
 
 | Kind | Request | Inputs | Returns | Transport |
 | --- | --- | --- | --- | --- |
-| Command | `PlayMoveCommand` | index (local/computer game) | `OperationResult<GameDto>` | JSON endpoint (`PlayMoveQuery` path) |
+| Command | `PlayMoveCommand` | index (local/computer game) | `OperationResult<GameDto>` | JSON endpoint (`PlayMoveCommand` path) |
 | Command | `SaveMatchCommand` | move list + claimed result | `OperationResult` | Razor POST (forgery-checked by engine replay, `Game.ForgedResult`) |
 | Command | `SendInvitationCommand` | target `userId` | `OperationResult<InvitationState>` | Hub `InvitePlayer` |
 | Command | `CancelInvitationCommand` | `invitationId` | `OperationResult` | Hub `CancelInvitation` |

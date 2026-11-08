@@ -40,5 +40,5 @@ The product must persist accounts and finished matches ([FR-15…FR-17](../../00
 
 ## Assumptions
 
-- The hosting plan's SQL Server provisioning (including restore/dump tools for the owner) remains available; migration strategy for production is finalized in [M7](../../00-product/roadmap.md).
+- The hosting plan's SQL Server provisioning (including restore/dump tools for the owner) remains available; migration strategy for production is finalized in [M13](../../00-product/roadmap.md).
 - Deciding "totals computed, not stored" is revisitable — if History ever grows into leaderboards, a materialized/derived path can be added behind the same repository contract.

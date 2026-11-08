@@ -279,7 +279,7 @@ The dependency rule is guarded by architecture tests **inside the unit suite** (
 | Infrastructure inward-only | `TicTacToe.Infrastructure` references only `TicTacToe.Application` and `TicTacToe.Domain` — never `TicTacToe.Web` |
 | Web not referenced | no type in any layer references `TicTacToe.Web` |
 
-These run on every build in CI alongside the unit suite ([CI/CD](../06-devops/deployment.md), [Testing strategy](../05-quality/test-strategy.md)). Real-server behaviour (cookie auth redirects, hub negotiate, two-browser races) is verified by the documented manual walkthrough scripts at milestone gates and the M7 sweep ([ADR-0008](adr/0008-nunit-moq-shouldly-testing.md)).
+These run on every build in CI alongside the unit suite ([CI/CD](../06-devops/deployment.md), [Testing strategy](../05-quality/test-strategy.md)). Real-server behaviour (cookie auth redirects, hub negotiate, two-browser races) is verified by the documented manual walkthrough scripts at milestone gates and the M13 sweep ([ADR-0008](adr/0008-nunit-moq-shouldly-testing.md)).
 
 ## Assumptions
 

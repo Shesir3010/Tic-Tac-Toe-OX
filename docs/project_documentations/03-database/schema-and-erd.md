@@ -20,7 +20,7 @@ Parent document: [PRD](../00-product/PRD.md) · Related: [System architecture](.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `Id` | `uniqueidentifier` | PK — the identity every command uses (`ICurrentUser`) |
-| `UserName` / `NormalizedUserName` | `nvarchar(max)` | **UNIQUE** index (Identity) — "username taken" error |
+| `UserName` / `NormalizedUserName` | `nvarchar(max)` | **UNIQUE** index (Identity) — "username taken" error; **this is the display name** shown in lobby/history (owner decision 2026-11-08, no separate `DisplayName` column); regex `^[A-Za-z0-9_]{3,20}$` enforced by validator |
 | `Email` / `NormalizedEmail` | `nvarchar(max)` | **UNIQUE** index — "email taken" error (registered users only) |
 | `PasswordHash` | `nvarchar(max)` | Identity-hashed; never read back by app code |
 | `LockoutEnd` / `LockoutEnabled` / `AccessFailedCount` | `datetimeoffset`/bit/int | Lockout state (5 failed attempts → 5 min) |
@@ -88,7 +88,8 @@ This is the deliberate inversion of the seniors' shape (games + moves as DB tabl
 
 ## Assumptions
 
-- `ApplicationUser` has no custom columns beyond `IdentityUser` — adding one (e.g. a display name) is a schema change through migrations, not a hand edit.
+- `ApplicationUser` has no custom columns beyond `IdentityUser` — `UserName` is the display name (shown in lobby/history); adding a separate display-name column is a schema change through migrations, not a hand edit, and is out of v1.
+- **Opponent display:** `OpponentUserId` NULL with `Mode = Computer` shows "Computer (Easy/Medium/Hard)"; NULL with `Mode = Local` shows "Local"; NULL with `Mode = Online` shows "Deleted player". A deleted account never erases the opponent's row (set-null rule).
 - The `Moves` string format (comma-separated ints) is a contract: engine replay, history rendering and the forgery check all read it; changing it requires a data migration, not just code.
 - Enum values are stored as ints and are v1-stable; adding a value is fine, renumbering an existing one is never allowed.
 - Identity tables are framework-owned — backup and retention questions for them are the host's concern, not the app's.

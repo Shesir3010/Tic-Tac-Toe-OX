@@ -26,7 +26,7 @@ flowchart LR
 ```
 
 - Hub methods (`MakeMove`, `Leave`, `RequestRematch`) only: authenticate → dispatch `IMediator` → broadcast the command's result ([../realtime-signalr.md](../realtime-signalr.md) §3). Room creation happens at invitation acceptance and the presence/invitation invocations (`GetOnlinePlayers`, `InvitePlayer`, `CancelInvitation`, `RespondToInvitation`) ride the same hub per [ADR-0009](0009-invitations-replace-room-codes.md) — no `JoinRoom` step exists anymore.
-- Local play stays on the stateless JSON endpoint `POST /api/game/move` → `PlayMoveQuery` — no hub connection, no session.
+- Local play stays on the stateless JSON endpoint `POST /api/game/move` → `PlayMoveCommand` — no hub connection, no session.
 - Connections/groups are managed as the transport concern: cookie-authenticated hub, `room-{id}` groups (internal opaque id, never user-facing) joined only after participant validation.
 
 ## Rationale (why B here)

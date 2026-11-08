@@ -20,7 +20,7 @@
 
 ## Milestones you join
 
-M0 (initial schema + Identity migration), M2 (`Matches` table + history index), M5 (index verification against real query plans), M7 (production sample verification).
+M0 (initial schema + Identity migration), M5 (`Matches` table), M6 (history index verification against real query plans), M13 (production sample verification).
 
 ## Definition of done
 

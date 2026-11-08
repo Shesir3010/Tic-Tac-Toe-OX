@@ -7,7 +7,7 @@
 - [00-product/PRD.md](../../00-product/PRD.md) — vision, scope, FRs, NFRs, success metrics
 - [00-product/v1-scope.md](../../00-product/v1-scope.md) — what the first build includes
 - [00-product/user-stories.md](../../00-product/user-stories.md) — acceptance criteria (US-01…US-17)
-- [00-product/roadmap.md](../../00-product/roadmap.md) — the M0–M7 delivery plan
+- [00-product/roadmap.md](../../00-product/roadmap.md) — the M0–M13 delivery plan
 
 ## How you work
 
@@ -19,7 +19,7 @@
 
 ## Milestones you join
 
-All of M0–M7 (acceptance criteria per story), with special ownership of M7 (the verification sweep traces every FR to a test or a walkthrough script).
+All of M0–M13 (acceptance criteria per story), with special ownership of M13 (the verification sweep traces every FR to a test or a walkthrough script).
 
 ## Definition of done
 

@@ -30,7 +30,7 @@ Features/Game/Moves/Query/GetBoardQueryHandler.cs
 5. The **only automated suite** is `test/TicTacToe.Application.UnitTests` (NUnit + Moq + Shouldly + AutoMock, per [ADR-0008](0008-nunit-moq-shouldly-testing.md)); integration and E2E suites are **owner-removed decisions**, revisitable by the "same bug class escapes twice" trigger recorded there.
 6. **Mock seams are provided by architecture, not by helper code:** every slice-visible dependency is an interface (`IRoomStore`, `IPresenceTracker`, `IInvitationManager`, `IUnitOfWork`, repositories, `ICurrentUser`), plus `TimeProvider`/`IRandomSource` fakes ([R-A4](../system-architecture.md)) so slices are unit-testable *by construction*.
 7. **Architecture tests live in the unit suite** and enforce the dependency rule: `Domain` references no NuGet package, no SignalR/EF/ASP.NET types; `Application` never sees SignalR; `R-A2` engine purity (invariants E1–E6, [ADR-0006](0006-pure-game-engine-in-domain.md)). A violating slice fails CI — no architecture-integrity policing via review alone.
-8. **Manual walkthrough scripts** (recorded consequences of the removed suites) cover real-server guarantees — cookie auth, hub negotiate, two-player races — executed at milestone gates and the M7 sweep ([ADR-0008 conventions](0008-nunit-moq-shouldly-testing.md)).
+8. **Manual walkthrough scripts** (recorded consequences of the removed suites) cover real-server guarantees — cookie auth, hub negotiate, two-player races — executed at milestone gates and the M13 sweep ([ADR-0008 conventions](0008-nunit-moq-shouldly-testing.md)).
 
 ## Consequences
 
