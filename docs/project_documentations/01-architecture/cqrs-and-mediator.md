@@ -66,18 +66,21 @@ Why the deliberate gaps (recorded so a reviewer never "fixes" them):
 
 Performance in the logging behavior is the warning mechanism; Cortex's optional exception-handling behaviors are **not** enabled — unexpected-exception translation stays in the Web layer's `GlobalExceptionHandler` (the single mapping point).
 
-Registration sketch (Application `DependencyInjection`) — logging behaviors only:
+Registration sketch (`Infrastructure/Extensions/DependencyInjection.cs` — all DI lives in Infrastructure;
+Application has no DI file and no `Microsoft.Extensions.DependencyInjection` reference) — logging behaviors only.
+Verified at M0: `AddCortexMediator` lives in `Cortex.Mediator.DependencyInjection` and takes `Type[]` marker types, not assemblies:
 
 ```csharp
 services.AddCortexMediator(
-    new[] { typeof(DependencyInjection).Assembly },   // TicTacToe.Application
+    new[] { typeof(ApplicationAssemblyMarker) },   // marker in TicTacToe.Application
     options =>
     {
         options.AddDefaultBehaviors();  // logging behaviors only — ADR-0007
     });
+services.AddMapster();
 ```
 
-Behavior note: the exact registration overload names are verified against the package README at M0 and this section is updated if they differ; the concerns and their order (logging observes everything) are the contract.
+Behavior note: logging observes everything; the concerns and their order are the contract.
 
 ### 3.1 Handler-owned commit (sketch)
 

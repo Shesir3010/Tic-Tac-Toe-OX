@@ -8,7 +8,12 @@ Parent document: [PRD](../00-product/PRD.md) §4.3 · Related: [System architect
 
 ## 1. The Dependency Rule
 
-Dependencies point inward only. The Domain references nothing; Application depends only on Domain; Infrastructure implements Application's abstractions; Web composes everything for DI. Frameworks, database and transport details live at the edge and are injected inward as interfaces owned by the Application (or Domain) layer.
+```
+Web → Application → Domain ← Infrastructure
+                      ↑______________|
+```
+
+Dependencies point inward only. The Domain references nothing; Application depends only on Domain; Infrastructure implements Application's abstractions; Web composes everything for DI via a single `AddInfrastructure()` call (Web references Infrastructure only for that DI call — never for its types). All DI registration lives in `Infrastructure/Extensions/DependencyInjection.cs`; Application has no DI file and no `Microsoft.Extensions.DependencyInjection` reference (enforced by `ArchitectureTests`). Frameworks, database and transport details live at the edge and are injected inward as interfaces owned by the Application (or Domain) layer.
 
 ```mermaid
 flowchart TD
@@ -119,8 +124,6 @@ src/
                                    cleanup interval 5 s)
     Exceptions/                  — application-level exception types (expected failures
                                    are OperationResult values, ADR-0010 — rarely thrown)
-    DependencyInjection.cs       — AddApplication(): contracts, validators,
-                                   AddCortexMediator, Mapster registration
   TicTacToe.Infrastructure/
     Data/
       ApplicationDbContext.cs    — IdentityDbContext + Match mapping
@@ -142,11 +145,11 @@ src/
       ComputerPlayerFactory.cs
       SystemRandomSource.cs
     Extensions/
-      DependencyInjection.cs     — AddInfrastructure(configuration): DbContext, Identity,
+      DependencyInjection.cs     — AddInfrastructure(configuration): Cortex Mediator (scan
+                                   Application), Mapster, DbContext, Identity,
                                    repositories, UnitOfWork, singletons, hosted service
   TicTacToe.Web/
-    Program.cs                   — composition root: AddApplication() +
-                                   AddInfrastructure(), cookie auth, MVC, SignalR,
+    Program.cs                   — composition root: AddInfrastructure(), cookie auth, MVC, SignalR,
                                    hub mapping, Serilog
     Hubs/
       GameHub.cs                 — /hubs/game: authenticate → dispatch IMediator →

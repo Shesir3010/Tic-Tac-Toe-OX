@@ -25,6 +25,11 @@ Versions are pinned centrally in `Directory.Packages.props` (Central Package Man
 
 ## 2. Projects & the dependency rule
 
+```
+Web → Application → Domain ← Infrastructure
+                      ↑______________|
+```
+
 ```mermaid
 flowchart LR
     Web["TicTacToe.Web"] --> App["TicTacToe.Application"] --> Domain["TicTacToe.Domain"]
@@ -32,7 +37,7 @@ flowchart LR
     Infra --> Domain
 ```
 
-Arrows point **inward only**. `Domain` references nothing. `Web` references `Infrastructure` solely to call its DI registration extension in `Program.cs` — never to use its types.
+Arrows point **inward only**. `Domain` references nothing. `Web` references `Infrastructure` solely to call its DI registration extension in `Program.cs` — never to use its types. All DI registration lives in `Infrastructure/Extensions/DependencyInjection.cs` (`AddInfrastructure`); **Application has no DI file and no `Microsoft.Extensions.DependencyInjection` reference** (enforced by `ArchitectureTests`).
 
 | Project | Owns | May reference |
 | --- | --- | --- |
@@ -100,7 +105,7 @@ TicTacToe/
 ## 4. Composition & lifetimes
 
 - Every service is registered behind an interface; **constructor injection only** — no service locator, no statics for state.
-- `Program.cs` composes: `AddApplication()` → `AddInfrastructure(builder.Configuration)` → web/hub wiring. Each layer's extension lives in its own project.
+- `Program.cs` is the only composition point: it calls `AddInfrastructure(builder.Configuration)` (all DI: Cortex/Mapster, DbContext, Identity, singletons). `Infrastructure/Extensions/DependencyInjection.cs` is the only DI file; **Application has no DI file and no `Microsoft.Extensions.DependencyInjection` reference** (enforced by `ArchitectureTests`).
 
 | Component | Lifetime | Why |
 | --- | --- | --- |
