@@ -52,6 +52,7 @@ function showRoomStatus(message) {
   const el = document.getElementById('room-status');
   const msg = document.getElementById('room-status-text');
   if (!el || !msg) return;
+  hideInviteStatus();
   el.hidden = false;
   msg.textContent = message;
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -59,6 +60,20 @@ function showRoomStatus(message) {
 
 function hideRoomStatus() {
   const el = document.getElementById('room-status');
+  if (el) el.hidden = true;
+}
+
+function showInviteStatus(message) {
+  const el = document.getElementById('invite-status');
+  const msg = document.getElementById('invite-status-text');
+  if (!el || !msg) return;
+  hideRoomStatus();
+  el.hidden = false;
+  msg.textContent = message;
+}
+
+function hideInviteStatus() {
+  const el = document.getElementById('invite-status');
   if (el) el.hidden = true;
 }
 
@@ -171,7 +186,8 @@ function showPopup(fromName, invitationId) {
   };
   if (rejectBtn) rejectBtn.onclick = async () => {
     acceptBtn.disabled = true; rejectBtn.disabled = true;
-    try { await conn.invoke('RespondToInvitation', invitationId, false); } finally { hidePopup(); toast('Invitation rejected.', 'info'); }
+    rejectBtn.textContent = 'Rejecting…';
+    try { await conn.invoke('RespondToInvitation', invitationId, false); showInviteStatus('You declined the invitation.'); } finally { hidePopup(); toast('Invitation rejected.', 'info'); }
   };
   const closeBtn = document.getElementById('popup-close');
   if (closeBtn) closeBtn.onclick = () => rejectBtn && rejectBtn.onclick && rejectBtn.onclick();
@@ -198,7 +214,9 @@ conn.on('InvitationReceived', (p) => showPopup(p.fromName, p.invitationId));
 conn.on('InvitationDeclined', (p) => {
   hideWaitingCard();
   hidePopup();
-  toast(p.byName ? `${p.byName} declined your invitation.` : 'Your invitation was declined.', 'info');
+  const msg = p?.byName ? `${p.byName} declined your invitation. You can invite again after 30s cooldown.` : 'Your invitation was declined. You can invite again after 30s cooldown.';
+  showInviteStatus(msg);
+  toast(msg, 'info');
 });
 conn.on('InvitationAccepted', (p) => {
   hideWaitingCard();
@@ -216,7 +234,9 @@ conn.on('InvitationAccepted', (p) => {
 conn.on('InvitationCancelled', (p) => {
   if (p?.invitationId && popupInvitationId === p.invitationId) hidePopup();
   if (p?.invitationId && pendingInvitationId === p.invitationId) hideWaitingCard(); else if (!popupInvitationId) hideWaitingCard();
-  toast(p?.reason === 'offline' ? 'The other player went offline. Invitation cancelled.' : 'Invitation cancelled.', 'info');
+  const msg = p?.reason === 'offline' ? 'The other player went offline. Invitation cancelled.' : 'Invitation cancelled.';
+  showInviteStatus(msg);
+  toast(msg, 'info');
 });
 
 export async function startHub() {

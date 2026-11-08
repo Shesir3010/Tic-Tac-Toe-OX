@@ -227,6 +227,7 @@ ttt-card, .ttt-card {
 }
 
 .ttt-waiting { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: rgb(99 102 241 / .12); border: 1px solid rgb(99 102 241 / .35); border-radius: var(--ttt-radius-control); padding: 8px 10px; color: var(--ttt-text-primary); font-size: .9rem; }
+.ttt-invite-status { background: rgb(239 68 68 / .12); border: 1px solid rgb(239 68 68 / .35); border-radius: var(--ttt-radius-control); padding: 8px 10px; color: var(--ttt-text-primary); font-size: .9rem; }
 .ttt-room-status { background: rgb(16 185 129 / .14); border: 1px solid rgb(16 185 129 / .4); border-radius: var(--ttt-radius-control); padding: 8px 10px; color: var(--ttt-text-primary); font-size: .9rem; }
 
 .ttt-modal-backdrop { position: fixed; inset: 0; background: rgb(2 6 23 / .68); backdrop-filter: blur(6px); z-index: 1040; }
