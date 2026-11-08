@@ -104,6 +104,31 @@ function resetBoard(newMatch) {
 document.getElementById('btn-reset').addEventListener('click', () => resetBoard(false));
 document.getElementById('btn-new-match').addEventListener('click', () => resetBoard(true));
 
+// M7.5 polish: segmented Mode chips + difficulty chips sync hidden selects (game rules read from selects).
+const modeLocalBtn = document.getElementById('mode-local');
+const modeComputerBtn = document.getElementById('mode-computer');
+const difficultyGroup = document.getElementById('difficulty-group');
+function syncModeChips() {
+  const vs = modeEl.value === '1';
+  modeLocalBtn.classList.toggle('is-active', !vs);
+  modeComputerBtn.classList.toggle('is-active', vs);
+  modeLocalBtn.setAttribute('aria-pressed', String(!vs));
+  modeComputerBtn.setAttribute('aria-pressed', String(vs));
+  difficultyGroup.hidden = !vs;
+}
+function syncDifficultyChips() {
+  difficultyGroup.querySelectorAll('button').forEach(b => {
+    const on = b.dataset.difficulty === difficultyEl.value;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+modeLocalBtn.addEventListener('click', () => { modeEl.value = '0'; modeEl.dispatchEvent(new Event('change')); syncModeChips(); });
+modeComputerBtn.addEventListener('click', () => { modeEl.value = '1'; modeEl.dispatchEvent(new Event('change')); syncModeChips(); });
+difficultyGroup.querySelectorAll('button').forEach(b => {
+  b.addEventListener('click', () => { difficultyEl.value = b.dataset.difficulty; difficultyEl.dispatchEvent(new Event('change')); syncDifficultyChips(); });
+});
+
 modeEl.addEventListener('change', () => {
   difficultyEl.disabled = modeEl.value !== '1';
   resetBoard(false);
@@ -197,5 +222,8 @@ boardEl.addEventListener('click', async (e) => {
   render(data.result);
 });
 
-difficultyEl.disabled = modeEl.value !== '1';
+difficultyEl.disabled = true;
+difficultyGroup.hidden = modeEl.value !== '1';
+syncModeChips();
+syncDifficultyChips();
 render(null);

@@ -88,8 +88,24 @@ body { margin-bottom: 60px; }
 
 /* Tic Tac Toe board (M3 local pass-and-play) */
 .ttt-game { max-width: 560px; margin: 2rem auto; text-align: center; }
-.ttt-scoreboard { display: flex; justify-content: space-between; gap: 1rem; font-size: 1.125rem; }
-.ttt-status { font-size: 1.5rem; margin: 1rem 0; }
+.ttt-panel { display: grid; gap: 10px; justify-items: center; margin-bottom: 16px; }
+.ttt-segmented, .ttt-difficulty {
+  display: inline-flex; padding: 4px; gap: 4px;
+  background: var(--ttt-surface); border: 1px solid var(--ttt-border-subtle);
+  border-radius: var(--ttt-radius-pill);
+}
+.ttt-segmented button, .ttt-difficulty button {
+  border: 0; border-radius: var(--ttt-radius-pill); padding: 8px 18px; min-height: 44px;
+  background: transparent; color: var(--ttt-text-secondary); font-weight: 600;
+}
+.ttt-segmented button.is-active, .ttt-difficulty button.is-active {
+  background: var(--ttt-primary); color: #fff; box-shadow: var(--ttt-shadow-glow-primary);
+}
+.ttt-scoreboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.ttt-score { background: var(--ttt-surface); border: 1px solid var(--ttt-border-subtle); border-radius: var(--ttt-radius-card); padding: 12px; box-shadow: var(--ttt-shadow-card); display: flex; flex-direction: column; gap: 4px; }
+.ttt-score strong { font-size: 1.75rem; font-family: var(--ttt-font-mono); color: var(--ttt-text-primary); }
+.ttt-score .ttt-mark-x, .ttt-score .ttt-mark-o, .ttt-draws-label { font-size: .95rem; font-weight: 700; }
+.ttt-status { font-size: 1.5rem; margin: 1rem 0; font-weight: 600; color: var(--ttt-text-primary); }
 .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; position: relative; }
 .ttt-cell { aspect-ratio: 1; min-height: 64px; font-size: 2.5rem; font-weight: 700; border: 1px solid #dee2e6; border-radius: .5rem; background: #fff; }
 .ttt-cell:hover { background: #f8f9fa; }
