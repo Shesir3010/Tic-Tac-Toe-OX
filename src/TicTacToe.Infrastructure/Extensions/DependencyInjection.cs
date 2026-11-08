@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.Configure<TicTacToe.Application.Settings.RoomSettings>(configuration.GetSection("RoomSettings"));
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddHostedService<RoomCleanupService>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {

@@ -224,14 +224,14 @@ conn.on('InvitationAccepted', (p) => {
   hideWaitingCard();
   hidePopup();
   const room = p?.room;
-  if (room) {
-    const isX = room.playerXId === myId;
-    const symbol = isX ? 'X' : 'O';
-    showRoomStatus(`Room ${room.id.slice(0, 8)}… ready — you are ${symbol}. Online play continues next (M11).`);
+  if (room?.id) {
+    if (!location.pathname.startsWith('/Rooms/')) {
+      location.href = `/Rooms/${room.id}`;
+    }
   } else {
     showRoomStatus('Invitation accepted! Room created.');
+    toast('Invitation accepted! Room created.', 'success');
   }
-  toast('Invitation accepted! Room created.', 'success');
 });
 conn.on('InvitationCancelled', (p) => {
   // Manual Cancel is sent only to the target (canceller already updated locally);

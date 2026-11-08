@@ -1,0 +1,25 @@
+@* Online room page (server-authoritative — GetRoomQuery is the resync source). *@
+@model TicTacToe.Domain.DTOs.Rooms.RoomState
+@{
+    ViewData["Title"] = "Online game";
+}
+<meta name="ttt:room-id" content="@Model.Id" />
+<div class="ttt-game" style="max-width:560px;margin:2rem auto;text-align:center">
+    <p class="ttt-status" id="room-status">Connecting…</p>
+    <p id="grace-banner" class="alert alert-warning" hidden>Opponent disconnected — reconnecting in <strong id="grace-seconds">60</strong>s…</p>
+    <p id="room-error" class="text-danger" hidden></p>
+    <div id="board" class="ttt-board" role="grid" aria-label="Online game board">
+        @for (int i = 0; i < 9; i++)
+        {
+            <button type="button" class="ttt-cell" data-index="@i" role="gridcell" aria-label="Row @(i / 3 + 1), column @(i % 3 + 1), empty"></button>
+        }
+    </div>
+    <div class="ttt-actions">
+        <button type="button" id="btn-leave" class="btn btn-outline-secondary">Leave game</button>
+        <button type="button" id="btn-rematch" class="btn btn-outline-primary" hidden>Rematch</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/room.js"></script>
+}

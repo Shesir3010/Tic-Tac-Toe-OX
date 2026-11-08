@@ -23,7 +23,9 @@ public sealed class GetOnlinePlayersQueryHandlerTests
         ]);
         var user = new Mock<ICurrentUser>();
         user.Setup(x => x.UserId).Returns(Me);
-        var handler = new GetOnlinePlayersQueryHandler(user.Object, presence.Object);
+        var invitations = new Mock<IInvitationManager>();
+        invitations.Setup(x => x.GetPendingForUser(It.IsAny<Guid>())).Returns(Array.Empty<TicTacToe.Domain.Online.Invitation>());
+        var handler = new GetOnlinePlayersQueryHandler(user.Object, presence.Object, invitations.Object, new Mock<IRoomStore>().Object);
 
         var result = await handler.Handle(new GetOnlinePlayersQuery(), default);
 
@@ -36,7 +38,7 @@ public sealed class GetOnlinePlayersQueryHandlerTests
     {
         var user = new Mock<ICurrentUser>();
         user.Setup(x => x.UserId).Returns((Guid?)null);
-        var handler = new GetOnlinePlayersQueryHandler(user.Object, new Mock<IPresenceTracker>().Object);
+        var handler = new GetOnlinePlayersQueryHandler(user.Object, new Mock<IPresenceTracker>().Object, new Mock<IInvitationManager>().Object, new Mock<IRoomStore>().Object);
 
         var result = await handler.Handle(new GetOnlinePlayersQuery(), default);
 

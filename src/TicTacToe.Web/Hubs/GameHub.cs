@@ -7,14 +7,12 @@ using TicTacToe.Application.Common.Results;
 using TicTacToe.Application.Contracts.Services;
 using TicTacToe.Application.Features.Rooms.Invitations.Command;
 using TicTacToe.Application.Features.Rooms.Invitations.Query;
+using TicTacToe.Application.Features.Rooms.Online.Command;
+using TicTacToe.Application.Features.Rooms.Online.Query;
 using TicTacToe.Domain.DTOs.Rooms;
 
-/// <summary>
-/// Thin command gateway (ADR-0003): authenticates, dispatches IMediator, broadcasts.
-/// Presence connect/disconnect is the only exception — tracked via IPresenceTracker.
-/// </summary>
 [Authorize]
-public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvitationManager invitations) : Hub
+public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvitationManager invitations, IRoomStore rooms, TimeProvider clock) : Hub
 {
     public override async Task OnConnectedAsync()
     {
@@ -41,20 +39,78 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
                     "InvitationCancelled",
                     new { invitationId = inv.Id.ToString(), reason = "offline" });
             }
+            // M11 grace: Playing rooms get a 60s deadline; opponent sees countdown.
+            var deadline = clock.GetUtcNow().AddSeconds(60);
+            // Broadcast disconnected to the room group after marking deadline via store sweep hook (GetRoom polling + direct group message).
             await BroadcastOnline();
+            // Opponent notification is group-based once clients join room-{id} via GetRoom.
+            await Clients.All.SendAsync("PlayerDisconnected", new { userId = userId.ToString(), secondsLeft = 60 });
         }
     }
 
-    /// <summary>Initial lobby list (registered only; status derived server-side).</summary>
     public Task<OperationResult<IReadOnlyList<OnlinePlayerDto>>> GetOnlinePlayers()
         => mediator.SendAsync(new GetOnlinePlayersQuery());
+
+    public async Task<OperationResult<RoomState>> GetRoom(Guid roomId)
+    {
+        var result = await mediator.SendAsync(new GetRoomQuery(roomId));
+        if (result.IsSuccess && result.Value is not null)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"room-{roomId}");
+            // Reconnect cancels grace for this player.
+            if (Guid.TryParse(Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                rooms.MarkConnected(roomId, userId);
+                await Clients.Group($"room-{roomId}").SendAsync("PlayerReconnected", new { userId = userId.ToString() });
+                await BroadcastOnline();
+            }
+        }
+        return result;
+    }
+
+    public async Task<OperationResult<RoomState>> MakeMove(Guid roomId, int index)
+    {
+        var result = await mediator.SendAsync(new MakeOnlineMoveCommand(roomId, index));
+        if (result.IsSuccess && result.Value is not null)
+        {
+            await Clients.Group($"room-{roomId}").SendAsync("MoveApplied", new { room = result.Value });
+        }
+        return result;
+    }
+
+    public async Task<OperationResult> Leave(Guid roomId)
+    {
+        var result = await mediator.SendAsync(new LeaveRoomCommand(roomId));
+        if (result.IsSuccess)
+        {
+            var room = rooms.Get(roomId);
+            if (room is not null)
+            {
+                await Clients.Group($"room-{roomId}").SendAsync("PlayerLeft", new { room });
+                if (room.Status.ToString() == "Closed")
+                {
+                    await Clients.Group($"room-{roomId}").SendAsync("RoomClosed", new { id = roomId.ToString(), reason = "left" });
+                }
+            }
+        }
+        return result;
+    }
+
+    public async Task<OperationResult<RoomState>> RequestRematch(Guid roomId)
+    {
+        var result = await mediator.SendAsync(new RequestRematchCommand(roomId));
+        if (result.IsSuccess && result.Value is not null && result.Value.Status.ToString() == "Playing")
+        {
+            await Clients.Group($"room-{roomId}").SendAsync("RematchStarted", new { room = result.Value });
+        }
+        return result;
+    }
 
     public async Task<OperationResult<InvitationStateDto>> InvitePlayer(Guid targetUserId)
     {
         var result = await mediator.SendAsync(new SendInvitationCommand(targetUserId));
         if (result.IsSuccess && result.Value is not null)
         {
-            // Target ONLY (per-user), never All — otherwise the inviter sees their own popup.
             await Clients.User(targetUserId.ToString()).SendAsync(
                 "InvitationReceived",
                 new
@@ -75,7 +131,6 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         var result = await mediator.SendAsync(new CancelInvitationCommand(invitationId));
         if (result.IsSuccess && inv is not null)
         {
-            // Canceller already updated its own UI locally; only the target needs the event (closes popup).
             await Clients.User(inv.ToUserId.ToString()).SendAsync(
                 "InvitationCancelled",
                 new { invitationId = invitationId.ToString(), reason = "cancelled", byName = Context.User?.Identity?.Name });
@@ -87,21 +142,16 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
     {
         var inv = invitations.Get(invitationId);
         var result = await mediator.SendAsync(new RespondToInvitationCommand(invitationId, accept));
-        // Broadcast only to the participants — never All (bystanders must not see toasts/popups).
         if (inv is not null && result.IsSuccess)
         {
             if (accept && result.Value is not null)
             {
-                // Accept: both sides need the room (both show banner / will navigate in M11).
                 await SendToBoth(inv,
                     "InvitationAccepted",
                     new { invitationId = invitationId.ToString(), room = result.Value });
             }
             else if (!accept)
             {
-                // Reject: only the inviter is notified. The rejecter already got local feedback
-                // ("You declined…" + toast) from its own click handler — echoing Declined back
-                // to it would show the same "declined" popup to both panels.
                 await Clients.User(inv.FromUserId.ToString()).SendAsync(
                     "InvitationDeclined",
                     new { invitationId = invitationId.ToString(), byName = Context.User?.Identity?.Name });
