@@ -74,12 +74,25 @@
         @RenderBody()
     </main>
 
-    <div id="invite-popup" class="modal" tabindex="-1" hidden role="dialog" aria-modal="true" aria-labelledby="popup-title">
-        <div class="modal-dialog">
-            <div class="modal-content ttt-card">
-                <div class="modal-header"><h3 id="popup-title">Invite</h3></div>
-                <div class="modal-body"><p id="popup-text"></p><div class="progress"><div id="popup-bar" class="progress-bar" role="progressbar" style="width:100%"></div></div></div>
-                <div class="modal-footer"><button type="button" id="popup-accept" class="btn btn-primary">Accept</button><button type="button" id="popup-reject" class="btn btn-outline-secondary">Reject</button></div>
+    <div id="invite-backdrop" class="ttt-modal-backdrop" hidden></div>
+    <div id="invite-popup" class="ttt-modal" hidden role="dialog" aria-modal="true" aria-labelledby="popup-title">
+        <div class="ttt-modal-card" role="document">
+            <button type="button" id="popup-close" class="btn btn-sm btn-link ttt-modal-close" aria-label="Decline">×</button>
+            <div class="ttt-modal-head">
+                <span id="popup-avatar" class="ttt-modal-avatar" aria-hidden="true">?</span>
+                <div>
+                    <p class="ttt-modal-kicker">Game invite</p>
+                    <h3 id="popup-title"><span id="popup-from-name">Player</span> invited you</h3>
+                    <p id="popup-text" class="ttt-modal-text"></p>
+                </div>
+            </div>
+            <div class="ttt-modal-meta">
+                <span id="popup-countdown" class="ttt-modal-countdown" aria-live="polite">Expires in 30s</span>
+                <div class="progress ttt-modal-progress"><div id="popup-bar" class="progress-bar" role="progressbar" style="width:100%"></div></div>
+            </div>
+            <div class="ttt-modal-actions">
+                <button type="button" id="popup-reject" class="btn btn-outline-secondary">Reject</button>
+                <button type="button" id="popup-accept" class="btn btn-primary ttt-modal-accept">Accept</button>
             </div>
         </div>
     </div>

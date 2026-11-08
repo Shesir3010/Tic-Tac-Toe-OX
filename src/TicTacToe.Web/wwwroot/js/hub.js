@@ -5,6 +5,9 @@ const conn = new signalR.HubConnectionBuilder()
   .build();
 
 const myId = document.querySelector('meta[name="ttt:user-id"]')?.content || '';
+let pendingInvitationId = null;
+let popupTimer = null;
+let popupInvitationId = null;
 
 function initials(name) {
   return (name || '?').trim().slice(0, 2).toUpperCase();
@@ -23,6 +26,44 @@ function toast(message, kind = 'info') {
   close.addEventListener('click', () => t.remove());
   document.body.appendChild(t);
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 170); }, kind === 'error' ? 6000 : 4000);
+}
+
+function showWaitingCard(name, invitationId) {
+  pendingInvitationId = invitationId;
+  const card = document.getElementById('waiting-card');
+  const label = document.getElementById('waiting-label');
+  if (!card) return;
+  card.hidden = false;
+  if (label) label.textContent = `Waiting for ${name}…`;
+  const cancel = document.getElementById('btn-cancel-invite');
+  if (cancel) cancel.onclick = async () => {
+    try { await conn.invoke('CancelInvitation', invitationId); } finally { hideWaitingCard(); toast('Invitation cancelled.', 'info'); }
+  };
+}
+
+function hideWaitingCard() {
+  pendingInvitationId = null;
+  const card = document.getElementById('waiting-card');
+  if (card) card.hidden = true;
+  refreshOnlineList();
+}
+
+function showRoomStatus(message) {
+  const el = document.getElementById('room-status');
+  const msg = document.getElementById('room-status-text');
+  if (!el || !msg) return;
+  el.hidden = false;
+  msg.textContent = message;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideRoomStatus() {
+  const el = document.getElementById('room-status');
+  if (el) el.hidden = true;
+}
+
+function refreshOnlineList() {
+  conn.invoke('GetOnlinePlayers').then((res) => renderOnline(res?.value || res?.players || [])).catch(() => { /* best-effort */ });
 }
 
 function renderOnline(players) {
@@ -53,11 +94,12 @@ function renderOnline(players) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-sm btn-primary';
-      btn.textContent = 'Invite';
+      const isWaiting = pendingInvitationId && p.userId && !pendingInvitationId.startsWith('__');
+      btn.textContent = isWaiting ? 'Waiting…' : 'Invite';
+      if (isWaiting) { btn.disabled = true; btn.classList.add('is-pressed'); btn.setAttribute('aria-pressed', 'true'); }
       btn.addEventListener('click', async () => {
-        // Pressed state: disable immediately so a second click can't double-invite.
         btn.disabled = true;
-        btn.textContent = 'Waiting…';
+        btn.textContent = 'Sending…';
         btn.classList.add('is-pressed');
         btn.setAttribute('aria-pressed', 'true');
         const res = await conn.invoke('InvitePlayer', p.userId);
@@ -69,10 +111,8 @@ function renderOnline(players) {
           btn.classList.remove('is-pressed');
           btn.removeAttribute('aria-pressed');
         } else if (res?.value) {
-          const card = document.getElementById('waiting-card');
-          card.hidden = false;
-          document.getElementById('waiting-name').textContent = p.displayName;
-          document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; btn.disabled = false; btn.textContent = 'Invite'; btn.classList.remove('is-pressed'); });
+          showWaitingCard(p.displayName, res.value.invitationId);
+          toast(`Invitation sent to ${p.displayName}.`, 'info');
         }
       });
       wrap.appendChild(btn);
@@ -84,34 +124,100 @@ function renderOnline(players) {
 
 conn.on('OnlinePlayersUpdated', (payload) => renderOnline(payload?.players || payload || []));
 
-function showPopup(title, text, invitationId) {
+function showPopup(fromName, invitationId) {
+  popupInvitationId = invitationId;
   const popup = document.getElementById('invite-popup');
-  document.getElementById('popup-title').textContent = title;
-  document.getElementById('popup-text').textContent = text;
+  const backdrop = document.getElementById('invite-backdrop');
+  const avatar = document.getElementById('popup-avatar');
+  const nameEl = document.getElementById('popup-from-name');
+  const countdownEl = document.getElementById('popup-countdown');
+  if (avatar) avatar.textContent = initials(fromName);
+  if (nameEl) nameEl.textContent = fromName || 'Player';
+  const textEl = document.getElementById('popup-text');
+  if (textEl) textEl.textContent = `${fromName || 'Player'} wants to play Tic Tac Toe with you.`;
+  if (backdrop) backdrop.hidden = false;
   popup.hidden = false;
-  popup.classList.add('show'); popup.style.display = 'block';
-  document.getElementById('popup-reject').focus();
+  popup.classList.add('show'); popup.style.display = 'flex';
+  document.getElementById('popup-reject')?.focus();
   const bar = document.getElementById('popup-bar');
-  let end = Date.now() + 30000;
-  const tick = setInterval(() => {
-    const left = Math.max(0, end - Date.now());
-    bar.style.width = `${(left / 30000) * 100}%`;
-    if (left <= 0) clearInterval(tick);
-  }, 500);
-  document.getElementById('popup-accept').onclick = () => { conn.invoke('RespondToInvitation', invitationId, true).finally(() => hidePopup()); };
-  document.getElementById('popup-reject').onclick = () => { conn.invoke('RespondToInvitation', invitationId, false).finally(() => hidePopup()); };
+  if (popupTimer) clearInterval(popupTimer);
+  let left = 30;
+  const renderBar = () => {
+    if (bar) bar.style.width = `${(left / 30) * 100}%`;
+    if (countdownEl) countdownEl.textContent = `Expires in ${left}s`;
+  };
+  renderBar();
+  popupTimer = setInterval(() => {
+    left -= 1;
+    renderBar();
+    if (left <= 0) {
+      clearInterval(popupTimer); popupTimer = null;
+      conn.invoke('RespondToInvitation', invitationId, false).finally(() => {
+        hidePopup();
+        toast('Invitation expired.', 'info');
+      });
+    }
+  }, 1000);
+  const acceptBtn = document.getElementById('popup-accept');
+  const rejectBtn = document.getElementById('popup-reject');
+  if (acceptBtn) acceptBtn.onclick = async () => {
+    acceptBtn.disabled = true; rejectBtn.disabled = true;
+    acceptBtn.textContent = 'Accepting…';
+    try {
+      const res = await conn.invoke('RespondToInvitation', invitationId, true);
+      if (res?.error) toast(res.error.message || 'Accept failed.', 'error');
+      else showRoomStatus('Accepted! Room created. You are O — online play is coming in M11.');
+    } finally { hidePopup(); }
+  };
+  if (rejectBtn) rejectBtn.onclick = async () => {
+    acceptBtn.disabled = true; rejectBtn.disabled = true;
+    try { await conn.invoke('RespondToInvitation', invitationId, false); } finally { hidePopup(); toast('Invitation rejected.', 'info'); }
+  };
+  const closeBtn = document.getElementById('popup-close');
+  if (closeBtn) closeBtn.onclick = () => rejectBtn && rejectBtn.onclick && rejectBtn.onclick();
+  const onKey = (e) => { if (e.key === 'Escape' && !popup.hidden) rejectBtn?.click(); };
+  document.addEventListener('keydown', onKey);
+  popup._onKey = onKey;
 }
 
 function hidePopup() {
   const popup = document.getElementById('invite-popup');
-  popup.hidden = true;
-  popup.style.display = 'none';
-  popup.classList.remove('show');
+  const backdrop = document.getElementById('invite-backdrop');
+  if (popupTimer) { clearInterval(popupTimer); popupTimer = null; }
+  if (popup._onKey) document.removeEventListener('keydown', popup._onKey);
+  if (popup) { popup.hidden = true; popup.style.display = 'none'; popup.classList.remove('show'); }
+  if (backdrop) backdrop.hidden = true;
+  popupInvitationId = null;
+  const a = document.getElementById('popup-accept');
+  const r = document.getElementById('popup-reject');
+  if (a) { a.disabled = false; a.textContent = 'Accept'; }
+  if (r) { r.disabled = false; r.textContent = 'Reject'; }
 }
 
-conn.on('InvitationReceived', (p) => showPopup('Invite', `${p.fromName || 'Player'} invited you to play`, p.invitationId));
-conn.on('InvitationDeclined', (p) => toast(p.byName ? `${p.byName} declined.` : 'Declined.', 'info'));
-conn.on('InvitationAccepted', () => toast('Room created! Online play continues in M11 room page.', 'success'));
+conn.on('InvitationReceived', (p) => showPopup(p.fromName, p.invitationId));
+conn.on('InvitationDeclined', (p) => {
+  hideWaitingCard();
+  hidePopup();
+  toast(p.byName ? `${p.byName} declined your invitation.` : 'Your invitation was declined.', 'info');
+});
+conn.on('InvitationAccepted', (p) => {
+  hideWaitingCard();
+  hidePopup();
+  const room = p?.room;
+  if (room) {
+    const isX = room.playerXId === myId;
+    const symbol = isX ? 'X' : 'O';
+    showRoomStatus(`Room ${room.id.slice(0, 8)}… ready — you are ${symbol}. Online play continues next (M11).`);
+  } else {
+    showRoomStatus('Invitation accepted! Room created.');
+  }
+  toast('Invitation accepted! Room created.', 'success');
+});
+conn.on('InvitationCancelled', (p) => {
+  if (p?.invitationId && popupInvitationId === p.invitationId) hidePopup();
+  if (p?.invitationId && pendingInvitationId === p.invitationId) hideWaitingCard(); else if (!popupInvitationId) hideWaitingCard();
+  toast(p?.reason === 'offline' ? 'The other player went offline. Invitation cancelled.' : 'Invitation cancelled.', 'info');
+});
 
 export async function startHub() {
   try {

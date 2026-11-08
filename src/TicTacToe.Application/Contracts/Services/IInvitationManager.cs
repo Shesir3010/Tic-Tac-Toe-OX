@@ -10,4 +10,6 @@ public interface IInvitationManager
     (bool ok, Invitation? invitation, string errorCode) Respond(Guid invitationId, Guid targetUserId, bool accept, TimeProvider clock);
     void ExpirePending(TimeProvider clock);
     void CancelForOffline(Guid userId);
+    Invitation? Get(Guid invitationId);
+    IReadOnlyList<Invitation> GetPendingForUser(Guid userId);
 }

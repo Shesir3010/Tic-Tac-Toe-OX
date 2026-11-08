@@ -31,8 +31,16 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         await base.OnDisconnectedAsync(exception);
         if (Guid.TryParse(Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
         {
+            var pending = invitations.GetPendingForUser(userId);
             presence.RemoveUser(userId);
             invitations.CancelForOffline(userId);
+            foreach (var inv in pending)
+            {
+                var counterpart = inv.FromUserId == userId ? inv.ToUserId : inv.FromUserId;
+                await Clients.User(counterpart.ToString()).SendAsync(
+                    "InvitationCancelled",
+                    new { invitationId = inv.Id.ToString(), reason = "offline" });
+            }
             await BroadcastOnline();
         }
     }
@@ -61,22 +69,46 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         return result;
     }
 
-    public Task<OperationResult> CancelInvitation(Guid invitationId)
-        => mediator.SendAsync(new CancelInvitationCommand(invitationId));
+    public async Task<OperationResult> CancelInvitation(Guid invitationId)
+    {
+        var inv = invitations.Get(invitationId);
+        var result = await mediator.SendAsync(new CancelInvitationCommand(invitationId));
+        if (result.IsSuccess && inv is not null)
+        {
+            await SendToBoth(inv,
+                "InvitationCancelled",
+                new { invitationId = invitationId.ToString(), reason = "cancelled", byName = Context.User?.Identity?.Name });
+        }
+        return result;
+    }
 
     public async Task<OperationResult<RoomState>> RespondToInvitation(Guid invitationId, bool accept)
     {
+        var inv = invitations.Get(invitationId);
         var result = await mediator.SendAsync(new RespondToInvitationCommand(invitationId, accept));
-        // Broadcast outcome to inviter + target (M10: room page arrives M11, popup shows result now).
-        if (accept && result.IsSuccess && result.Value is not null)
+        // Broadcast only to the two participants (never All — bystanders must not see toasts/popups).
+        if (inv is not null && result.IsSuccess)
         {
-            await Clients.All.SendAsync("InvitationAccepted", new { invitationId = invitationId.ToString(), room = result.Value });
-        }
-        else if (!accept)
-        {
-            await Clients.All.SendAsync("InvitationDeclined", new { invitationId = invitationId.ToString(), byName = Context.User?.Identity?.Name });
+            if (accept && result.Value is not null)
+            {
+                await SendToBoth(inv,
+                    "InvitationAccepted",
+                    new { invitationId = invitationId.ToString(), room = result.Value });
+            }
+            else if (!accept)
+            {
+                await SendToBoth(inv,
+                    "InvitationDeclined",
+                    new { invitationId = invitationId.ToString(), byName = Context.User?.Identity?.Name });
+            }
         }
         return result;
+    }
+
+    private async Task SendToBoth(TicTacToe.Domain.Online.Invitation inv, string method, object payload)
+    {
+        await Clients.User(inv.FromUserId.ToString()).SendAsync(method, payload);
+        await Clients.User(inv.ToUserId.ToString()).SendAsync(method, payload);
     }
 
     private async Task BroadcastOnline()

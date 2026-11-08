@@ -101,4 +101,36 @@ public sealed class InvitationManager(IPresenceTracker presence, IOptions<RoomSe
             }
         }
     }
+
+    public Invitation? Get(Guid invitationId)
+    {
+        lock (_gate)
+        {
+            return _pending.TryGetValue(invitationId, out var inv) ? new Invitation
+            {
+                Id = inv.Id,
+                FromUserId = inv.FromUserId,
+                ToUserId = inv.ToUserId,
+                Status = inv.Status,
+                CreatedAtUtc = inv.CreatedAtUtc,
+                ExpiresAtUtc = inv.ExpiresAtUtc,
+            } : null;
+        }
+    }
+
+    public IReadOnlyList<Invitation> GetPendingForUser(Guid userId)
+    {
+        lock (_gate)
+        {
+            return _pending.Values.Where(i => i.FromUserId == userId || i.ToUserId == userId).Select(i => new Invitation
+            {
+                Id = i.Id,
+                FromUserId = i.FromUserId,
+                ToUserId = i.ToUserId,
+                Status = i.Status,
+                CreatedAtUtc = i.CreatedAtUtc,
+                ExpiresAtUtc = i.ExpiresAtUtc,
+            }).ToList();
+        }
+    }
 }
