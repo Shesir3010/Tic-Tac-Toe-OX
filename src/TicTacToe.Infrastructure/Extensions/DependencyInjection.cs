@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IComputerPlayerFactory, ComputerPlayerFactory>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddSingleton<IPresenceTracker, PresenceTracker>();
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
