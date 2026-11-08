@@ -33,6 +33,7 @@ One feature per milestone. Every milestone ends with **live, checkable behaviour
 | M5 | Save & forgery proof (SaveMatch + replay) | FR-15, FR-25 replay | ☐ | Forged save rejected (`Game.ForgedResult`) · honest save writes row once · W-11 passed |
 | M6 | History & stats pages | FR-16, FR-17 | ☐ | Totals computed from rows · paged history with opponent names · "Deleted player" shows correctly · U-9 + W-11 passed |
 | M7 | Accounts (register / login / logout / lockout) | FR-14 | ☐ | Duplicate emails/usernames inline · generic credential error · lockout after 5 tries · W-8 passed |
+| M7.5 | Theme, sound & settings (polish) | FR-13, FR-21, FR-22 | ☐ | Tokens `--ttt-*` + pre-paint theme · `/Settings` public (Theme × Sound + reset, browser-only) · Web-Audio sound + mute · winning overlay · responsive 360px · keyboard + `aria-live` · Lighthouse a11y ≥ 90 / perf ≥ 85 · owner toggled theme+sound |
 | M8 | Guests (play without account, browser-only) | FR-18, FR-06, FR-12 (Could) | ☐ | Guest plays local/computer · nothing hits the database · W-11 (guest) passed |
 | M9 | Presence (hub gateway + online list live) | FR-32 | ☐ | List updates live, no refresh · `userId → connectionCount` flips on disconnect · status Available/Invited/In game derived correctly · walkthrough observed |
 | M10 | Invitations (send, popup accept/reject, 30 s expiry, 30 s cooldown, one-outgoing) | FR-33…FR-36 | ☐ | Guard + race unit tests green (self/offline/In-game/Invited/cooldown, accept-vs-expire exactly-once) · W-1, W-2, W-5, W-10 passed |

@@ -96,6 +96,16 @@
 - [ ] Lockout after 5 failures → `Auth.LockedOut`
 - [ ] W-8 passed
 
+## M7.5 — Theme, sound & settings (polish)
+
+- [ ] Tokens `--ttt-*` in `site.css` (dark-first, Inter/JetBrains Mono self-hosted, Bootstrap 5.3 `data-bs-theme` swap)
+- [ ] Theme Light/Dark/Device (default Device), applied **before first paint** (no white flash, inline head script), stored in `localStorage` (FR-13)
+- [ ] `/Settings` **public** page: Theme × Sound (On/Off, default On) + “Reset to defaults”, browser-only, works for guests, no server round-trip (FR-22)
+- [ ] Sound: synthesized Web-Audio tones (place/win/lose/draw), always-visible mute toggle, persisted, only after first interaction (FR-21)
+- [ ] Board polish: winning overlay line + highlight, mark-draw (300ms) + turn pulse + toasts/skeletons, `prefers-reduced-motion` disables animation, responsive down to 360px, keyboard board (arrows + Enter/Space) with `aria-live`
+- [ ] NFR gate: Lighthouse a11y ≥ 90 / perf ≥ 85, keyboard-complete game, zero console errors
+- [ ] ☑ Owner toggled theme + sound and Settings reflects it
+
 ## M8 — Guests
 
 - [ ] Guest plays local/computer (browser only)
