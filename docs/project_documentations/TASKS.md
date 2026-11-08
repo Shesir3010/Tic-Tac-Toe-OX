@@ -55,13 +55,15 @@
 
 ## M3 — Local pass-and-play
 
-- [ ] `Game/Web` page renders server `RoomState`-equivalent board (stateless: browser sends board + move)
-- [ ] `PlayMoveCommand` + `POST /api/game/move` (server validates via engine)
-- [ ] Winning-line highlight + status text (game state, not just code)
-- [ ] Reset (keeps scoreboard) + New match (zeroes scoreboard)
-- [ ] Session scoreboard (X / Draws / O) tracked incl. guests
-- [ ] Handler tests green (unit)
-- [ ] ☑ Owner clicked a full 2-player game
+- [x] `Game/Web` page renders server `RoomState`-equivalent board (stateless: browser sends board + move)
+- [x] `PlayMoveCommand` + `POST /api/game/move` (server validates via engine)
+- [x] Winning-line highlight + status text (game state, not just code)
+- [x] Reset (keeps scoreboard) + New match (zeroes scoreboard)
+- [x] Session scoreboard (X / Draws / O) tracked incl. guests
+- [x] Handler tests green (unit)
+- [x] ☑ Owner clicked a full 2-player game
+
+**Evidence (M3 closed, owner-confirmed 2026-11-08):** `345b2c4` — build Release 0 warnings 0 errors · `dotnet test` 91/91 (8 handler U-2) · live `GET /` 200, `POST /api/game/move` valid 200 (turn flips to O) / occupied 409 / no-token 400, `walkthroughs/W-M3-2026-11-08.md`.
 
 ## M4 — Computer play
 
