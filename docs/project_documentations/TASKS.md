@@ -31,15 +31,17 @@
 
 ## M1 — Engine core
 
-- [ ] `Domain/Engine/`: `Board`, `Player`, `Rules` (Validate/Apply/Evaluate), `GameResult`
-- [ ] E1 legality (bounds, occupancy, turn) — tests
-- [ ] E2 strict X-first alternation — tests
-- [ ] E3 all 8 win lines — `[TestCase]` per line, both symbols
-- [ ] E4 draw detection — test
-- [ ] E5 finished immutability — tests
-- [ ] E6 determinism — tests
-- [ ] **100% line coverage** on the engine (hard gate)
-- [ ] Architecture tests prove `Domain` references nothing
+- [x] `Domain/Engine/`: `Board`, `Player`, `Rules` (Validate/Apply/Evaluate), `GameResult`
+- [x] E1 legality (bounds, occupancy, turn) — tests
+- [x] E2 strict X-first alternation — tests
+- [x] E3 all 8 win lines — `[TestCase]` per line, both symbols
+- [x] E4 draw detection — test
+- [x] E5 finished immutability — tests
+- [x] E6 determinism — tests
+- [x] **100% line coverage** on the engine (hard gate)
+- [x] Architecture tests prove `Domain` references nothing
+
+**Evidence (M1 closed 2026-11-08):** `ad8fbb1` — `dotnet build` Release 0 warnings 0 errors · `dotnet test` 49/49 (5 architecture + 44 engine) · coverlet `coverage.cobertura.xml` Domain line 1.0 + branch 1.0.
 
 ## M2 — AI (Easy → Medium → Hard)
 
