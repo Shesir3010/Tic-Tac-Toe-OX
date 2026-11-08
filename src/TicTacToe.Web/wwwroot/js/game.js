@@ -8,9 +8,11 @@ const scoreOEl = document.getElementById('score-o');
 const modeEl = document.getElementById('mode');
 const difficultyEl = document.getElementById('difficulty');
 const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+const authenticated = document.querySelector('meta[name="ttt:authenticated"]')?.content === 'true';
 
 let cells = Array(9).fill(null);
 let turn = 0;
+let moves = [];
 let finished = false;
 let busy = false;
 let thinking = false;
@@ -56,6 +58,7 @@ function render(result) {
 function resetBoard(newMatch) {
   cells = Array(9).fill(null);
   turn = 0;
+  moves = [];
   finished = false;
   thinking = false;
   errorEl.hidden = true;
@@ -113,6 +116,8 @@ boardEl.addEventListener('click', async (e) => {
   }
 
   cells = data.board;
+  moves.push(index);
+  if (data.computerMoveIndex !== null && data.computerMoveIndex !== undefined) moves.push(data.computerMoveIndex);
   turn = data.turn === null || data.turn === undefined ? -1 : data.turn;
   finished = data.result && data.result.outcome !== 0;
 
@@ -121,6 +126,20 @@ boardEl.addEventListener('click', async (e) => {
     else if (data.result.outcome === 2) score.o++;
     else if (data.result.outcome === 3) score.draws++;
     saveScore();
+
+    if (authenticated && !res.redirected) {
+      // SaveMatch (Razor POST): server replays Moves and compares claimed result.
+      // Symbol is X (human always X in local/computer v1); claimed maps from server outcome.
+      const claimed = data.result.outcome === 3 ? 2 : (data.result.outcome === 1 ? 0 : 1);
+      const fd = new FormData();
+      fd.append('moves', moves.join(','));
+      fd.append('symbol', '0');
+      fd.append('mode', String(modeEl.value));
+      fd.append('difficulty', modeEl.value === '1' ? difficultyEl.value : '');
+      fd.append('claimedResult', String(claimed));
+      fd.append('__RequestVerificationToken', tokenEl ? tokenEl.value : '');
+      await fetch('/Matches/Save', { method: 'POST', body: fd });
+    }
   }
 
   render(data.result);

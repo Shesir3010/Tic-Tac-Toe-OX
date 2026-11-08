@@ -1,8 +1,8 @@
-﻿@* Tic Tac Toe game page (server-rendered, render-only JS — server is referee). *@
-@{
+﻿@{
     ViewData["Title"] = "Tic Tac Toe";
 }
 
+<meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
 <div class="ttt-game">
     <div class="ttt-controls">
         <label>
