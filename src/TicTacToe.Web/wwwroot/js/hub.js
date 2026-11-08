@@ -28,12 +28,59 @@ function renderOnline(players) {
     const status = document.createElement('span');
     status.className = 'ttt-badge-status';
     status.textContent = 'Available';
-    li.append(av, name, status);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-sm btn-primary';
+    btn.textContent = 'Invite';
+    btn.addEventListener('click', async () => {
+      const res = await conn.invoke('InvitePlayer', p.userId);
+      const err = res?.error;
+      if (err) alert(err.message || 'Invite failed');
+      else if (res?.value) {
+        const card = document.getElementById('waiting-card');
+        card.hidden = false;
+        document.getElementById('waiting-name').textContent = p.displayName;
+        document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; });
+      }
+    });
+    const wrap = document.createElement('span');
+    wrap.className = 'd-inline-flex align-items-center gap-2';
+    wrap.append(name, status, btn);
+    li.append(av, wrap);
     list.appendChild(li);
   });
 }
 
 conn.on('OnlinePlayersUpdated', (payload) => renderOnline(payload?.players || payload || []));
+
+function showPopup(title, text, invitationId) {
+  const popup = document.getElementById('invite-popup');
+  document.getElementById('popup-title').textContent = title;
+  document.getElementById('popup-text').textContent = text;
+  popup.hidden = false;
+  popup.classList.add('show'); popup.style.display = 'block';
+  document.getElementById('popup-reject').focus();
+  const bar = document.getElementById('popup-bar');
+  let end = Date.now() + 30000;
+  const tick = setInterval(() => {
+    const left = Math.max(0, end - Date.now());
+    bar.style.width = `${(left / 30000) * 100}%`;
+    if (left <= 0) clearInterval(tick);
+  }, 500);
+  document.getElementById('popup-accept').onclick = () => { conn.invoke('RespondToInvitation', invitationId, true).finally(() => hidePopup()); };
+  document.getElementById('popup-reject').onclick = () => { conn.invoke('RespondToInvitation', invitationId, false).finally(() => hidePopup()); };
+}
+
+function hidePopup() {
+  const popup = document.getElementById('invite-popup');
+  popup.hidden = true;
+  popup.style.display = 'none';
+  popup.classList.remove('show');
+}
+
+conn.on('InvitationReceived', (p) => showPopup('Invite', `${p.fromName || 'Player'} invited you to play`, p.invitationId));
+conn.on('InvitationDeclined', (p) => alert(p.byName ? `${p.byName} declined.` : 'Declined.'));
+conn.on('InvitationAccepted', () => alert('Room created! Online play continues in M11 room page.'));
 
 export async function startHub() {
   try {

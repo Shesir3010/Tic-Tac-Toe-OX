@@ -12,8 +12,19 @@
             <span id="lobby-count" class="ttt-lobby-count" aria-live="polite">0 online</span>
         </div>
         <p class="ttt-lobby-sub">Find someone to play right now.</p>
+        <p id="waiting-card" class="ttt-waiting" hidden>Waiting for <span id="waiting-name"></span>… <button type="button" id="btn-cancel-invite" class="btn btn-sm btn-outline-secondary">Cancel</button></p>
         <ul id="online-list" class="ttt-lobby-list"></ul>
     </aside>
+
+    <div id="invite-popup" class="modal" tabindex="-1" hidden role="dialog" aria-modal="true" aria-labelledby="popup-title">
+        <div class="modal-dialog">
+            <div class="modal-content ttt-card">
+                <div class="modal-header"><h3 id="popup-title">Invite</h3></div>
+                <div class="modal-body"><p id="popup-text"></p><div class="progress"><div id="popup-bar" class="progress-bar" role="progressbar" style="width:100%"></div></div></div>
+                <div class="modal-footer"><button type="button" id="popup-accept" class="btn btn-primary">Accept</button><button type="button" id="popup-reject" class="btn btn-outline-secondary">Reject</button></div>
+            </div>
+        </div>
+    </div>
 
     <div class="ttt-game">
         @if (User.Identity?.IsAuthenticated != true)

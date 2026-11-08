@@ -35,6 +35,9 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPresenceTracker, PresenceTracker>();
+        services.AddSingleton<IInvitationManager, InvitationManager>();
+        services.AddSingleton<IRoomStore, InMemoryRoomStore>();
+        services.Configure<TicTacToe.Application.Settings.RoomSettings>(configuration.GetSection("RoomSettings"));
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
