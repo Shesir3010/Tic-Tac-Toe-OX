@@ -35,6 +35,28 @@
   --ttt-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
 }
 
+:root[data-bs-theme="light"] {
+  --ttt-bg: #ffffff;
+  --ttt-surface: #ffffff;
+  --ttt-surface-raised: #f1f5f9;
+  --ttt-border-subtle: #e2e8f0;
+  --ttt-border-strong: #94a3b8;
+  --ttt-text-primary: #0f172a;
+  --ttt-text-secondary: #334155;
+  --ttt-text-muted: #64748b;
+  --ttt-text-disabled: #94a3b8;
+  --ttt-primary: #4f46e5;
+  --ttt-primary-hover: #6366f1;
+  --ttt-mark-x: #0284c7;
+  --ttt-mark-o: #e11d48;
+  --ttt-success: #047857;
+  --ttt-danger: #dc2626;
+  --ttt-danger-text: #b91c1c;
+  --ttt-status-playing: #b45309;
+  --ttt-shadow-card: 0 1px 2px rgb(15 23 42 / .08), 0 8px 24px -12px rgb(15 23 42 / .18);
+  --ttt-shadow-overlay: 0 12px 40px -12px rgb(15 23 42 / .25);
+}
+
 html {
   font-size: 14px;
 }
@@ -103,7 +125,7 @@ ttt-card, .ttt-card {
   min-height: 64px;
   transition: transform var(--ttt-duration-fast) var(--ttt-ease-out), background var(--ttt-duration-fast);
 }
-.ttt-cell:hover:not(:disabled) { background: #334155; }
+.ttt-cell:hover:not(:disabled) { background: var(--ttt-border-strong); }
 .ttt-cell:focus-visible { outline: 2px solid var(--ttt-primary-hover); outline-offset: 2px; }
 .ttt-cell:active:not(:disabled) { transform: scale(.97); }
 .ttt-mark-x { color: var(--ttt-mark-x); text-shadow: var(--ttt-shadow-glow-x); }
