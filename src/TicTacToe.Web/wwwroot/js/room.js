@@ -36,20 +36,27 @@ async function loadRoom() {
   if (res?.value) render(res.value);
 }
 
+function statusOf(room) {
+  // Wire enums are numbers (RoomStatus Playing=0, Finished=1, Closed=2) — accept strings too.
+  return room.status === 0 || room.status === 'Playing' ? 'Playing'
+    : room.status === 1 || room.status === 'Finished' ? 'Finished' : 'Closed';
+}
+
 function render(room) {
   state = room;
+  const st = statusOf(room);
   const cells = boardEl.querySelectorAll('.ttt-cell');
   cells.forEach((cell, i) => {
     const v = room.board?.[i];
     cell.textContent = v === 0 ? 'X' : v === 1 ? 'O' : '';
-    cell.disabled = room.status !== 'Playing' || !isMyTurn(room);
+    cell.disabled = st !== 'Playing' || !isMyTurn(room);
     cell.setAttribute('aria-label', `Row ${Math.floor(i / 3) + 1}, column ${(i % 3) + 1}, ${v === 0 ? 'X' : v === 1 ? 'O' : 'empty'}`);
   });
-  if (room.status === 'Playing') {
+  if (st === 'Playing') {
     statusEl.textContent = isMyTurn(room) ? 'Your turn' : "Opponent's turn";
     rematchBtn.hidden = true;
     errorEl.hidden = true;
-  } else if (room.status === 'Finished') {
+  } else if (st === 'Finished') {
     const r = room.result;
     statusEl.textContent = r ? (r.outcome === 3 ? "It's a draw." : myMark(room) === r.outcome ? 'You win!' : 'Opponent wins.') : 'Finished.';
     rematchBtn.hidden = false;
@@ -60,7 +67,8 @@ function render(room) {
   }
 }
 
-function myMark(room) { return room.playerXId === myId ? 0 : 1; }
+function sameId(a, b) { return String(a || '').toLowerCase() === String(b || '').toLowerCase(); }
+function myMark(room) { return sameId(room.playerXId, myId) ? 0 : 1; }
 function isMyTurn(room) {
   const turn = room.turn === 0 ? 0 : 1;
   return turn === myMark(room);
