@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
+    <meta name="ttt:user-id" content="@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")" />
     <title>@ViewData["Title"] - TicTacToe.Web</title>
     <script>
       // M7.5 FR-13: apply saved theme BEFORE first paint (no white flash).

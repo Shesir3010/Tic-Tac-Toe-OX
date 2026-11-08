@@ -4,8 +4,25 @@ const conn = new signalR.HubConnectionBuilder()
   .withAutomaticReconnect({ nextRetryDelayInMilliseconds: 1000 })
   .build();
 
+const myId = document.querySelector('meta[name="ttt:user-id"]')?.content || '';
+
 function initials(name) {
   return (name || '?').trim().slice(0, 2).toUpperCase();
+}
+
+function toast(message, kind = 'info') {
+  const t = document.createElement('div');
+  t.className = `ttt-toast show ttt-toast-${kind}`;
+  t.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  t.textContent = message;
+  const close = document.createElement('button');
+  close.className = 'btn btn-sm btn-link';
+  close.setAttribute('aria-label', 'Dismiss');
+  close.textContent = '×';
+  t.appendChild(close);
+  close.addEventListener('click', () => t.remove());
+  document.body.appendChild(t);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 170); }, kind === 'error' ? 6000 : 4000);
 }
 
 function renderOnline(players) {
@@ -16,6 +33,7 @@ function renderOnline(players) {
   const arr = players || [];
   if (count) count.textContent = `${arr.length} online`;
   arr.forEach(p => {
+    const isSelf = p.userId === myId;
     const li = document.createElement('li');
     li.className = 'ttt-player';
     const av = document.createElement('span');
@@ -24,38 +42,41 @@ function renderOnline(players) {
     av.setAttribute('aria-hidden', 'true');
     const name = document.createElement('span');
     name.className = 'ttt-player-name';
-    name.textContent = p.displayName;
+    name.textContent = isSelf ? `${p.displayName} (You)` : p.displayName;
     const status = document.createElement('span');
     status.className = 'ttt-badge-status';
     status.textContent = 'Available';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-sm btn-primary';
-    btn.textContent = 'Invite';
-    btn.addEventListener('click', async () => {
-      // Pressed state: disable immediately so a second click can't double-invite.
-      btn.disabled = true;
-      btn.textContent = 'Waiting…';
-      btn.classList.add('is-pressed');
-      btn.setAttribute('aria-pressed', 'true');
-      const res = await conn.invoke('InvitePlayer', p.userId);
-      const err = res?.error;
-      if (err) {
-        alert(err.message || 'Invite failed');
-        btn.disabled = false;
-        btn.textContent = 'Invite';
-        btn.classList.remove('is-pressed');
-        btn.removeAttribute('aria-pressed');
-      } else if (res?.value) {
-        const card = document.getElementById('waiting-card');
-        card.hidden = false;
-        document.getElementById('waiting-name').textContent = p.displayName;
-        document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; btn.disabled = false; btn.textContent = 'Invite'; btn.classList.remove('is-pressed'); });
-      }
-    });
     const wrap = document.createElement('span');
     wrap.className = 'd-inline-flex align-items-center gap-2';
-    wrap.append(name, status, btn);
+    wrap.append(name, status);
+    if (!isSelf) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm btn-primary';
+      btn.textContent = 'Invite';
+      btn.addEventListener('click', async () => {
+        // Pressed state: disable immediately so a second click can't double-invite.
+        btn.disabled = true;
+        btn.textContent = 'Waiting…';
+        btn.classList.add('is-pressed');
+        btn.setAttribute('aria-pressed', 'true');
+        const res = await conn.invoke('InvitePlayer', p.userId);
+        const err = res?.error;
+        if (err) {
+          toast(err.message || 'Invite failed', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Invite';
+          btn.classList.remove('is-pressed');
+          btn.removeAttribute('aria-pressed');
+        } else if (res?.value) {
+          const card = document.getElementById('waiting-card');
+          card.hidden = false;
+          document.getElementById('waiting-name').textContent = p.displayName;
+          document.getElementById('btn-cancel-invite').onclick = () => conn.invoke('CancelInvitation', res.value.invitationId).finally(() => { card.hidden = true; btn.disabled = false; btn.textContent = 'Invite'; btn.classList.remove('is-pressed'); });
+        }
+      });
+      wrap.appendChild(btn);
+    }
     li.append(av, wrap);
     list.appendChild(li);
   });
@@ -89,8 +110,8 @@ function hidePopup() {
 }
 
 conn.on('InvitationReceived', (p) => showPopup('Invite', `${p.fromName || 'Player'} invited you to play`, p.invitationId));
-conn.on('InvitationDeclined', (p) => alert(p.byName ? `${p.byName} declined.` : 'Declined.'));
-conn.on('InvitationAccepted', () => alert('Room created! Online play continues in M11 room page.'));
+conn.on('InvitationDeclined', (p) => toast(p.byName ? `${p.byName} declined.` : 'Declined.', 'info'));
+conn.on('InvitationAccepted', () => toast('Room created! Online play continues in M11 room page.', 'success'));
 
 export async function startHub() {
   try {
