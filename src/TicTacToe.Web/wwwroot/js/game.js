@@ -14,9 +14,11 @@ const authenticated = document.querySelector('meta[name="ttt:authenticated"]')?.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (!document.getElementById('win-line')) {
-  const overlay = document.createElement('div');
-  overlay.id = 'win-line';
-  overlay.className = 'ttt-win-line';
+  const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  overlay.setAttribute('id', 'win-line');
+  overlay.setAttribute('viewBox', '0 0 100 100');
+  overlay.setAttribute('preserveAspectRatio', 'none');
+  overlay.classList.add('ttt-win-line');
   overlay.hidden = true;
   overlay.setAttribute('aria-hidden', 'true');
   boardEl.appendChild(overlay);
@@ -53,17 +55,11 @@ function drawWinLine(line) {
   const overlay = document.getElementById('win-line');
   if (!overlay) return;
   if (!line || line.length !== 3 || reducedMotion) { overlay.hidden = true; return; }
-  const [a, b, c] = line;
-  const ax = (a % 3) * 33.333, ay = Math.floor(a / 3) * 33.333;
-  const cx = (c % 3) * 33.333, cy = Math.floor(c / 3) * 33.333;
-  const mx = (ax + cx) / 2 + 16.6, my = (ay + cy) / 2 + 16.6;
-  const len = Math.hypot(cx - ax, cy - ay);
-  const angle = Math.atan2(cy - ay, cx - ax) * 180 / Math.PI;
+  const [a, , c] = line;
+  const ax = (a % 3) * 33.333 + 16.667, ay = Math.floor(a / 3) * 33.333 + 16.667;
+  const cx = (c % 3) * 33.333 + 16.667, cy = Math.floor(c / 3) * 33.333 + 16.667;
+  overlay.innerHTML = `<line x1="${ax}%" y1="${ay}%" x2="${cx}%" y2="${cy}%"></line>`;
   overlay.hidden = false;
-  overlay.style.width = `${len}%`;
-  overlay.style.left = `${mx - len / 2}%`;
-  overlay.style.top = `${my}%`;
-  overlay.style.transform = `rotate(${angle}deg)`;
 }
 
 function render(result) {

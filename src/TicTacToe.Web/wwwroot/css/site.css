@@ -160,11 +160,10 @@ ttt-card, .ttt-card {
 .ttt-winning { background: rgb(16 185 129 / .18); box-shadow: inset 0 0 0 3px var(--ttt-success), var(--ttt-shadow-glow-x); }
 
 .ttt-win-line {
-  position: absolute; left: 0; right: 0; top: 0; height: 4px; margin: auto;
-  border-radius: 999px; background: var(--ttt-success);
-  transition: transform var(--ttt-duration-deliberate) var(--ttt-ease-out);
-  pointer-events: none;
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; overflow: visible; z-index: 2;
 }
+.ttt-win-line line { stroke: var(--ttt-success); stroke-width: 6; stroke-linecap: round; }
 
 .ttt-controls label { display: inline-flex; flex-direction: column; gap: 4px; margin-right: 12px; text-align: left; }
 
