@@ -13,17 +13,6 @@
 }
 <div class="ttt-home">
     <div class="ttt-left">
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <div class="ttt-userbox" aria-label="Your account">
-            <span class="ttt-avatar" aria-hidden="true">@(User.Identity?.Name?.Length >= 2 ? User.Identity.Name.Substring(0, 2).ToUpper() : "?")</span>
-            <div class="ttt-user-meta">
-                <div class="ttt-user-line"><span class="ttt-player-name">@User.Identity?.Name</span><span class="ttt-user-online"><span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>Online</span></div>
-                <div class="ttt-user-stats"><span>Win: <strong>@(ViewBag.Stats?.Wins ?? 0)</strong></span><span>Loss: <strong>@(ViewBag.Stats?.Losses ?? 0)</strong></span></div>
-            </div>
-        </div>
-    }
-
     <aside id="lobby" class="ttt-lobby" aria-label="Online players">
         <div class="ttt-lobby-head">
             <span class="ttt-dot ttt-dot-live" aria-hidden="true"></span>
