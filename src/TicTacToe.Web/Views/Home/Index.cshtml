@@ -11,7 +11,7 @@
             <span class="ttt-avatar" aria-hidden="true">@(User.Identity?.Name?.Length >= 2 ? User.Identity.Name.Substring(0, 2).ToUpper() : "?")</span>
             <div>
                 <div class="ttt-player-name">@User.Identity?.Name</div>
-                <div class="ttt-user-status"><span class="ttt-dot ttt-dot-live" aria-hidden="true"></span> Online</div>
+                <div class="ttt-user-status"><span class="ttt-dot ttt-dot-live" aria-hidden="true"></span> Online · <strong>Win: @(ViewBag.Stats?.Wins ?? 0) &nbsp; Loss: @(ViewBag.Stats?.Losses ?? 0)</strong></div>
             </div>
         </div>
     }
