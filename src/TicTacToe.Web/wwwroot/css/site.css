@@ -29,3 +29,16 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Tic Tac Toe board (M3 local pass-and-play) */
+.ttt-game { max-width: 560px; margin: 2rem auto; text-align: center; }
+.ttt-scoreboard { display: flex; justify-content: space-between; gap: 1rem; font-size: 1.125rem; }
+.ttt-status { font-size: 1.5rem; margin: 1rem 0; }
+.ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ttt-cell { aspect-ratio: 1; min-height: 64px; font-size: 2.5rem; font-weight: 700; border: 1px solid #dee2e6; border-radius: .5rem; background: #fff; }
+.ttt-cell:hover { background: #f8f9fa; }
+.ttt-cell:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+.ttt-mark-x { color: #2563eb; }
+.ttt-mark-o { color: #dc2626; }
+.ttt-winning { background: #d1e7dd; box-shadow: inset 0 0 0 3px #10b981; }
+.ttt-actions { margin-top: 1rem; display: flex; gap: .5rem; justify-content: center; }

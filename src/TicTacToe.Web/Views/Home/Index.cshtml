@@ -1,8 +1,33 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* Tic Tac Toe game page (server-rendered, render-only JS — server is referee). *@
+@{
+    ViewData["Title"] = "Tic Tac Toe";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="ttt-game">
+    <div class="ttt-scoreboard" aria-live="polite">
+        <span>X <strong id="score-x">0</strong></span>
+        <span>Draws <strong id="score-draws">0</strong></span>
+        <span>O <strong id="score-o">0</strong></span>
+    </div>
+
+    <p id="status" class="ttt-status" aria-live="polite">X's turn</p>
+    <p id="error" class="text-danger" hidden></p>
+
+    <div id="board" class="ttt-board" role="grid" aria-label="Game board">
+        @for (int i = 0; i < 9; i++)
+        {
+            <button type="button" class="ttt-cell" data-index="@i" role="gridcell" aria-label="Row @(i / 3 + 1), column @(i % 3 + 1), empty"></button>
+        }
+    </div>
+
+    <div class="ttt-actions">
+        <button type="button" id="btn-reset" class="btn btn-outline-primary">Reset</button>
+        <button type="button" id="btn-new-match" class="btn btn-outline-secondary">New match</button>
+    </div>
+
+    @Html.AntiForgeryToken()
 </div>
+
+@section Scripts {
+    <script type="module" src="~/js/game.js"></script>
+}
