@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TicTacToe.Application/TicTacToe.Application.csproj" />
+    <Project Path="src/TicTacToe.Domain/TicTacToe.Domain.csproj" />
+    <Project Path="src/TicTacToe.Infrastructure/TicTacToe.Infrastructure.csproj" />
+    <Project Path="src/TicTacToe.Web/TicTacToe.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/TicTacToe.Application.UnitTests/TicTacToe.Application.UnitTests.csproj" />
+  </Folder>
+</Solution>
