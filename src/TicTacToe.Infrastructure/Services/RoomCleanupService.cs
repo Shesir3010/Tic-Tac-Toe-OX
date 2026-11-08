@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,10 +14,9 @@ namespace TicTacToe.Infrastructure.Services;
 
 /// <summary>5s tick: grace forfeits (both rows once) + orphaned close (no saves) + invitation expiry.</summary>
 public sealed class RoomCleanupService(
+    IServiceScopeFactory scopes,
     IRoomStore rooms,
     IInvitationManager invitations,
-    IMatchRepository matches,
-    IUnitOfWork unitOfWork,
     TimeProvider clock,
     IOptions<RoomSettings> settings,
     ILogger<RoomCleanupService> logger) : BackgroundService
@@ -40,33 +40,36 @@ public sealed class RoomCleanupService(
     public async Task TickAsync(CancellationToken ct)
     {
         var sweep = rooms.SweepExpired(clock, settings.Value.GraceSeconds);
-        foreach (var finish in sweep.ForfeitFinishes)
-        {
-            var now = clock.GetUtcNow();
-            var csv = string.Join(",", finish.Moves);
-            await matches.AddAsync(new Match
-            {
-                UserId = finish.Room.PlayerXId,
-                OpponentUserId = finish.Room.PlayerOId,
-                Mode = MatchMode.Online,
-                Symbol = Player.X,
-                Result = finish.WinnerId == finish.Room.PlayerXId ? MatchResult.Win : MatchResult.Loss,
-                Moves = csv,
-                PlayedAtUtc = now,
-            }, ct);
-            await matches.AddAsync(new Match
-            {
-                UserId = finish.Room.PlayerOId,
-                OpponentUserId = finish.Room.PlayerXId,
-                Mode = MatchMode.Online,
-                Symbol = Player.O,
-                Result = finish.WinnerId == finish.Room.PlayerOId ? MatchResult.Win : MatchResult.Loss,
-                Moves = csv,
-                PlayedAtUtc = now,
-            }, ct);
-        }
         if (sweep.ForfeitFinishes.Count > 0)
         {
+            using var scope = scopes.CreateScope();
+            var matches = scope.ServiceProvider.GetRequiredService<IMatchRepository>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            foreach (var finish in sweep.ForfeitFinishes)
+            {
+                var now = clock.GetUtcNow();
+                var csv = string.Join(",", finish.Moves);
+                await matches.AddAsync(new Match
+                {
+                    UserId = finish.Room.PlayerXId,
+                    OpponentUserId = finish.Room.PlayerOId,
+                    Mode = MatchMode.Online,
+                    Symbol = Player.X,
+                    Result = finish.WinnerId == finish.Room.PlayerXId ? MatchResult.Win : MatchResult.Loss,
+                    Moves = csv,
+                    PlayedAtUtc = now,
+                }, ct);
+                await matches.AddAsync(new Match
+                {
+                    UserId = finish.Room.PlayerOId,
+                    OpponentUserId = finish.Room.PlayerXId,
+                    Mode = MatchMode.Online,
+                    Symbol = Player.O,
+                    Result = finish.WinnerId == finish.Room.PlayerOId ? MatchResult.Win : MatchResult.Loss,
+                    Moves = csv,
+                    PlayedAtUtc = now,
+                }, ct);
+            }
             await unitOfWork.SaveChangesAsync(ct);
         }
         invitations.ExpirePending(clock);

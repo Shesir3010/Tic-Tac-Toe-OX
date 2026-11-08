@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -26,6 +27,20 @@ public sealed class RoomCleanupServiceTests
         public override DateTimeOffset GetUtcNow() => now;
     }
 
+    private static (RoomCleanupService service, Mock<IMatchRepository> repo, Mock<IUnitOfWork> uow) Build(Mock<IRoomStore> rooms)
+    {
+        var repo = new Mock<IMatchRepository>();
+        var uow = new Mock<IUnitOfWork>();
+        var services = new ServiceCollection();
+        services.AddScoped<IMatchRepository>(_ => repo.Object);
+        services.AddScoped<IUnitOfWork>(_ => uow.Object);
+        var provider = services.BuildServiceProvider();
+        var factory = new Mock<IServiceScopeFactory>();
+        factory.Setup(x => x.CreateScope()).Returns(provider.CreateScope());
+        var service = new RoomCleanupService(factory.Object, rooms.Object, new Mock<IInvitationManager>().Object, new FakeClock(T0), Options.Create(new RoomSettings()), Microsoft.Extensions.Logging.Abstractions.NullLogger<RoomCleanupService>.Instance);
+        return (service, repo, uow);
+    }
+
     [Test]
     public async Task Tick_Forfeit_SavesBothRowsOnce()
     {
@@ -33,10 +48,7 @@ public sealed class RoomCleanupServiceTests
         var rooms = new Mock<IRoomStore>();
         rooms.Setup(x => x.SweepExpired(It.IsAny<TimeProvider>(), 60)).Returns(new RoomSweepResult(
             [new RoomFinish(room, [0], OUser, XUser)], []));
-        var invitations = new Mock<IInvitationManager>();
-        var repo = new Mock<IMatchRepository>();
-        var uow = new Mock<IUnitOfWork>();
-        var service = new RoomCleanupService(rooms.Object, invitations.Object, repo.Object, uow.Object, new FakeClock(T0), Options.Create(new RoomSettings()), Microsoft.Extensions.Logging.Abstractions.NullLogger<RoomCleanupService>.Instance);
+        var (service, repo, uow) = Build(rooms);
 
         await service.TickAsync(default);
 
@@ -50,9 +62,7 @@ public sealed class RoomCleanupServiceTests
         var room = new RoomState(Guid.NewGuid(), RoomStatus.Closed, new Player?[9], null, XUser, OUser, null);
         var rooms = new Mock<IRoomStore>();
         rooms.Setup(x => x.SweepExpired(It.IsAny<TimeProvider>(), 60)).Returns(new RoomSweepResult([], [room]));
-        var repo = new Mock<IMatchRepository>();
-        var uow = new Mock<IUnitOfWork>();
-        var service = new RoomCleanupService(rooms.Object, new Mock<IInvitationManager>().Object, repo.Object, uow.Object, new FakeClock(T0), Options.Create(new RoomSettings()), Microsoft.Extensions.Logging.Abstractions.NullLogger<RoomCleanupService>.Instance);
+        var (service, repo, uow) = Build(rooms);
 
         await service.TickAsync(default);
 
