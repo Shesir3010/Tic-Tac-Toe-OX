@@ -166,10 +166,12 @@
 
 ## M12 — Account extras
 
-- [ ] Change password (current password verified → `Auth.WrongPassword`)
-- [ ] Delete account (password re-entry → in one transaction: forfeit-first if in an active room, then cascade delete + opponent "Deleted player")
-- [ ] History shows "Deleted player" for the deleted opponent
-- [ ] W-12 passed
+- [x] Change password (current password verified → `Auth.WrongPassword`)
+- [x] Delete account (password re-entry → in one transaction: forfeit-first if in an active room, then cascade delete + opponent "Deleted player")
+- [x] History shows "Deleted player" for the deleted opponent
+- [x] W-12 passed
+
+**Evidence (M12 closed, owner-confirmed 2026-11-09):** `IAccountService` Change/Delete with `Auth.WrongPassword`, Profile page (`Profile.cshtml`), forfeit-first via `LeaveRoomCommand`, `OpponentUserId` nulled explicitly + cascade, History “Deleted player” · build Release 0 warnings 0 errors · tests 138/138 · `walkthroughs/W-M12-2026-11-09.md`.
 
 ## M13 — Final verification sweep
 
