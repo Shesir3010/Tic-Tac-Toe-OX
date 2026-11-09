@@ -149,7 +149,7 @@ function render(room) {
       setTimeout(() => { if (winModal.hidden === false) window.location.href = '/'; }, 3000);
     }
   } else {
-    statusEl.textContent = `Room closed. ${winText(result)}`;
+    statusEl.textContent = 'Game ended.';
     rematchBtn.hidden = true;
     hideRematch();
     cells.forEach(c => c.disabled = true);
@@ -169,7 +169,13 @@ boardEl.addEventListener('click', async (e) => {
   }
 });
 
-leaveBtn.addEventListener('click', () => { leaveModal.hidden = false; btnLeaveCancel.focus(); });
+leaveBtn.addEventListener('click', () => {
+  const st = state ? statusOf(state) : 'Playing';
+  document.getElementById('leave-text').textContent = st === 'Playing'
+    ? 'Leaving counts as a loss. The opponent wins and both results will be saved.'
+    : 'The game already ended — leaving just returns you home. The saved result does not change.';
+  leaveModal.hidden = false; btnLeaveCancel.focus();
+});
 btnLeaveCancel.addEventListener('click', () => { leaveModal.hidden = true; });
 leaveModal.addEventListener('click', (e) => { if (e.target === leaveModal) leaveModal.hidden = true; });
 document.addEventListener('keydown', (e) => {
