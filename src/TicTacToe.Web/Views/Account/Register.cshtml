@@ -37,7 +37,10 @@
 
             <div class="mb-3">
                 <label asp-for="ConfirmPassword" class="form-label"></label>
-                <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+                <div class="input-group">
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" id="pw2" autocomplete="new-password" />
+                    <button type="button" class="btn btn-outline-secondary" data-eye="pw2" aria-label="Show password">Show</button>
+                </div>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
