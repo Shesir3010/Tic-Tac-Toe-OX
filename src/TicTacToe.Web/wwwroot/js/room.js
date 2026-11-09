@@ -14,6 +14,8 @@ const btnLeaveCancel = document.getElementById('btn-leave-cancel');
 const btnLeaveConfirm = document.getElementById('btn-leave-confirm');
 const leftModal = document.getElementById('left-modal');
 const btnLeftHome = document.getElementById('btn-left-home');
+const winModal = document.getElementById('win-modal');
+const btnWinHome = document.getElementById('btn-win-home');
 const myId = document.querySelector('meta[name="ttt:user-id"]')?.content || '';
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -31,6 +33,8 @@ let state = null;
 let graceTimer = null;
 let pollTimer = null;
 let rematchRequested = false;
+let wasInGrace = false;
+let prevStatus = null;
 
 function drawWinLine(line) {
   if (!line || line.length !== 3 || reducedMotion) { winOverlay.hidden = true; winOverlay.innerHTML = ''; return; }
@@ -95,8 +99,10 @@ function isMyTurn(room) {
 }
 
 function render(room) {
+  const prev = prevStatus;
   state = room;
   const st = statusOf(room);
+  prevStatus = st;
   const cells = boardEl.querySelectorAll('.ttt-cell');
   const result = room.result;
   const winning = result?.winningLine || result?.WinningLine;
@@ -136,6 +142,12 @@ function render(room) {
     rematchBtn.disabled = rematchRequested;
     rematchBtn.textContent = rematchRequested ? 'Waiting…' : 'Rematch';
     errorEl.hidden = true;
+    // Offline-timeout forfeit: we were in grace, now Finished with our win → win popup + home.
+    if (wasInGrace && prev === 'Playing' && text === 'You win!') {
+      stopGrace();
+      showWinModal();
+      setTimeout(() => { if (winModal.hidden === false) window.location.href = '/'; }, 3000);
+    }
   } else {
     statusEl.textContent = `Room closed. ${winText(result)}`;
     rematchBtn.hidden = true;
@@ -183,6 +195,8 @@ rematchBtn.addEventListener('click', async () => {
 });
 
 btnLeftHome.addEventListener('click', () => { window.location.href = '/'; });
+btnWinHome.addEventListener('click', () => { window.location.href = '/'; });
+function showWinModal() { winModal.hidden = false; btnWinHome.focus(); }
 function showLeftModal(msg) {
   document.querySelector('#left-modal p').textContent = msg || 'Opponent left the game. You win!';
   leftModal.hidden = false; btnLeftHome.focus();
@@ -191,6 +205,7 @@ function showRematch(msg) { rematchStatus.hidden = false; rematchText.textConten
 function hideRematch() { rematchStatus.hidden = true; }
 
 function startGrace(secondsLeft) {
+  wasInGrace = true;
   let left = Number(secondsLeft) || 60;
   graceBanner.hidden = false;
   graceSeconds.textContent = String(left);

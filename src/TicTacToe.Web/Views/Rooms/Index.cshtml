@@ -50,6 +50,16 @@
     </div>
 </div>
 
+<div id="win-modal" class="ttt-modal-backdrop" hidden>
+    <div class="ttt-modal-card" role="dialog" aria-modal="true" aria-labelledby="win-title">
+        <h3 id="win-title">You win!</h3>
+        <p>Your opponent didn’t reconnect in time — forfeit recorded in history.</p>
+        <div class="ttt-modal-actions">
+            <button type="button" id="btn-win-home" class="btn btn-primary">Back to home</button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script type="module" src="~/js/room.js"></script>
 }
