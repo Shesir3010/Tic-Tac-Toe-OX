@@ -175,12 +175,14 @@
 
 ## M13 — Final verification sweep
 
-- [ ] **FR sweep:** FR-01…FR-36 (excl. superseded FR-23/FR-24) traced to test/script; pass/fail recorded ([test-plan](05-quality/test-plan.md), [test-plan §1 FR registry](00-product/PRD.md))
-- [ ] **US sweep:** every happy + unhappy Gherkin block walked against the live app (US-01…US-17)
-- [ ] **Error-copy sweep:** every failure code shows exactly its literal message ([error-handling](02-backend/error-handling.md))
-- [ ] **NFR spot-checks:** move round-trip p95 < 500 ms · page paint < 2 s · Lighthouse a11y ≥ 90 / perf ≥ 85 · zero console errors · zero build warnings
+- [x] **FR sweep:** FR-01…FR-36 (excl. superseded FR-23/FR-24) traced to test/script; pass/fail recorded ([test-plan](05-quality/test-plan.md), [test-plan §1 FR registry](00-product/PRD.md))
+- [x] **US sweep:** every happy + unhappy Gherkin block walked against the live app (US-01…US-17)
+- [x] **Error-copy sweep:** every failure code shows exactly its literal message ([error-handling](02-backend/error-handling.md))
+- [x] **NFR spot-checks:** move round-trip p95 < 500 ms · page paint < 2 s · Lighthouse a11y ≥ 90 / perf ≥ 85 · zero console errors · zero build warnings
 - [ ] **Deploy rehearsal:** ≤ 30 min manual deploy on the host (owner); produced migration script; prod secrets checklist; `logs/` writability fallback
-- [ ] Docs match shipped behavior (docs change first on any deviation, per roadmap)
+- [x] Docs match shipped behavior (docs change first on any deviation, per roadmap)
+
+**Evidence (M13 sweep automated+live, owner-confirmed 2026-11-09):** build Release 0 warnings 0 errors · tests 140/140 · FR/US traced + error-copy literals (Invite `[name]`) + NFR green · `walkthroughs/W-M13-2026-11-09.md`. Deploy rehearsal remains owner TODO (agents never deploy).
 
 ## Notes
 
