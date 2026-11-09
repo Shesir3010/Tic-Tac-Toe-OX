@@ -54,7 +54,12 @@ function drawWinLine(line) {
 async function startHub() {
   hubConn = new signalR.HubConnectionBuilder().withUrl('/hubs/game').withAutomaticReconnect().build();
   hubConn.on('MoveApplied', (p) => render(p.room));
-  hubConn.on('RematchStarted', (p) => { rematchRequested = false; render(p.room); toast('Rematch started — X to move.', 'success'); });
+  hubConn.on('RematchStarted', (p) => {
+    rematchRequested = false; render(p.room);
+    toast('Rematch started — X to move.', 'success');
+    // Rematch initiator becomes X — reload so the server-rendered score header matches the new marks.
+    setTimeout(() => location.reload(), 600);
+  });
   hubConn.on('RematchRequested', (p) => { showRematch(`Rematch requested by ${p.byName || 'opponent'} — press Rematch to accept.`); });
   hubConn.on('PlayerDisconnected', (p) => startGrace(p.secondsLeft || 60));
   hubConn.on('PlayerReconnected', () => stopGrace());

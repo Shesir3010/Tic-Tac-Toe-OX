@@ -80,6 +80,27 @@ public sealed class RoomStoreTests
         c2.ShouldBe("");
         r2!.Status.ToString().ShouldBe("Playing");
         r2.Board.ShouldBe(new Player?[9]);
+        // XUser was the initiator, already X → stays X.
+        r2.PlayerXId.ShouldBe(XUser);
+    }
+
+    [Test]
+    public void RequestRematch_OInitiator_BecomesX()
+    {
+        var store = new InMemoryRoomStore();
+        var (ok, room, _) = store.Create(XUser, OUser);
+        ok.ShouldBeTrue();
+        store.ApplyMove(room!.Id, XUser, 0);
+        store.ApplyMove(room.Id, OUser, 3);
+        store.ApplyMove(room.Id, XUser, 1);
+        store.ApplyMove(room.Id, OUser, 4);
+        store.ApplyMove(room.Id, XUser, 2);
+
+        store.RequestRematch(room.Id, OUser);
+        var (r, c) = store.RequestRematch(room.Id, XUser);
+        c.ShouldBe("");
+        r!.PlayerXId.ShouldBe(OUser);
+        r.PlayerOId.ShouldBe(XUser);
     }
 
     [Test]

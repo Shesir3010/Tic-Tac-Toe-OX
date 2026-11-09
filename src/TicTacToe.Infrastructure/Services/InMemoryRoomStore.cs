@@ -111,6 +111,7 @@ public sealed class InMemoryRoomStore : IRoomStore
             if (room is null) return (null, "Room.NotFound");
             if (!IsParticipant(room, playerId)) return (null, "Room.NotParticipant");
             if (room.Status != RoomStatus.Finished) return (null, "Game.AlreadyOver");
+            if (room.RematchInitiatorId is null) room.RematchInitiatorId = playerId;
             if (room.PlayerXId == playerId) room.XRematchRequested = true; else room.ORematchRequested = true;
             if (!(room.XRematchRequested && room.ORematchRequested)) return (ToState(room), "Game.AlreadyOver");
             room.Board = Board.Empty();
@@ -118,6 +119,12 @@ public sealed class InMemoryRoomStore : IRoomStore
             room.Status = RoomStatus.Playing;
             room.XRematchRequested = false;
             room.ORematchRequested = false;
+            // The player who requested the rematch begins the next game as X (inviter rule applies to rematch too).
+            if (room.RematchInitiatorId is not null && room.RematchInitiatorId != room.PlayerXId)
+            {
+                (room.PlayerXId, room.PlayerOId) = (room.PlayerOId, room.PlayerXId);
+            }
+            room.RematchInitiatorId = null;
             return (ToState(room), "");
         }
     }
