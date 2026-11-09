@@ -14,12 +14,14 @@ public sealed class InvitationManagerTests
     private static readonly Guid A = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     private static readonly Guid B = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
 
+    private static InMemoryRoomStore Rooms() => new();
+
     private InvitationManager Manager(FakeClock clock, int countB = 1, int countA = 1)
     {
         var presence = new PresenceTracker();
         for (var i = 0; i < countB; i++) presence.AddUser(B, "B");
         for (var i = 0; i < countA; i++) presence.AddUser(A, "A");
-        return new InvitationManager(presence, Options.Create(new RoomSettings { InvitationTtlSeconds = 30, CooldownSeconds = 30 }));
+        return new InvitationManager(presence, Rooms(), Options.Create(new RoomSettings { InvitationTtlSeconds = 30, CooldownSeconds = 30 }));
     }
 
     [Test]
@@ -34,9 +36,22 @@ public sealed class InvitationManagerTests
     {
         var presence = new PresenceTracker();
         presence.AddUser(A, "A");
-        var manager = new InvitationManager(presence, Options.Create(new RoomSettings()));
+        var manager = new InvitationManager(presence, Rooms(), Options.Create(new RoomSettings()));
 
         manager.Send(A, B, new FakeClock(T0)).errorCode.ShouldBe("Invite.Offline");
+    }
+
+    [Test]
+    public void Send_InGameTarget_InviteBusy()
+    {
+        var rooms = Rooms();
+        rooms.Create(A, B);
+        var presence = new PresenceTracker();
+        var c = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
+        presence.AddUser(A, "A"); presence.AddUser(B, "B"); presence.AddUser(c, "C");
+        var manager = new InvitationManager(presence, rooms, Options.Create(new RoomSettings()));
+
+        manager.Send(c, B, new FakeClock(T0)).errorCode.ShouldBe("Invite.Busy");
     }
 
     [Test]
@@ -47,7 +62,7 @@ public sealed class InvitationManagerTests
         var c = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
         var presence = new PresenceTracker();
         presence.AddUser(A, "A"); presence.AddUser(B, "B"); presence.AddUser(c, "C");
-        var m2 = new InvitationManager(presence, Options.Create(new RoomSettings()));
+        var m2 = new InvitationManager(presence, Rooms(), Options.Create(new RoomSettings()));
         m2.Send(A, B, clock).ok.ShouldBeTrue();
 
         m2.Send(c, B, clock).errorCode.ShouldBe("Invite.Busy");
@@ -60,7 +75,7 @@ public sealed class InvitationManagerTests
         var presence = new PresenceTracker();
         var c = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
         presence.AddUser(A, "A"); presence.AddUser(B, "B"); presence.AddUser(c, "C");
-        var manager = new InvitationManager(presence, Options.Create(new RoomSettings()));
+        var manager = new InvitationManager(presence, Rooms(), Options.Create(new RoomSettings()));
         manager.Send(A, B, clock).ok.ShouldBeTrue();
 
         manager.Send(A, c, clock).errorCode.ShouldBe("Invite.AlreadyPending");

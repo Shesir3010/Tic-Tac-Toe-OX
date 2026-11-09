@@ -5,7 +5,7 @@ using TicTacToe.Domain.Online;
 
 namespace TicTacToe.Infrastructure.Services;
 
-public sealed class InvitationManager(IPresenceTracker presence, IOptions<RoomSettings> settings) : IInvitationManager
+public sealed class InvitationManager(IPresenceTracker presence, IRoomStore rooms, IOptions<RoomSettings> settings) : IInvitationManager
 {
     private readonly Dictionary<Guid, Invitation> _pending = new();
     private readonly Dictionary<(Guid From, Guid To), DateTimeOffset> _cooldowns = new();
@@ -20,6 +20,9 @@ public sealed class InvitationManager(IPresenceTracker presence, IOptions<RoomSe
             if (from == to) return (false, null, "Invite.Self");
             if (presence.ConnectionCount(to) == 0) return (false, null, "Invite.Offline");
             if (presence.ConnectionCount(from) == 0) return (false, null, "Invite.Offline");
+            // In-game guard (FR-36): a player inside a Playing room is busy — lobby disables
+            // the Invite button for them, and the server rejects direct hub calls with the same code.
+            if (rooms.IsInGame(to) || rooms.IsInGame(from)) return (false, null, "Invite.Busy");
             if (_pending.Values.Any(i => i.FromUserId == from)) return (false, null, "Invite.AlreadyPending");
             if (_pending.Values.Any(i => i.ToUserId == to || i.FromUserId == to)) return (false, null, "Invite.Busy");
             if (_cooldowns.TryGetValue((from, to), out var until) && until > clock.GetUtcNow()) return (false, null, "Invite.Cooldown");

@@ -99,9 +99,13 @@ function renderOnline(players) {
     const name = document.createElement('span');
     name.className = 'ttt-player-name';
     name.textContent = isSelf ? `${p.displayName} (You)` : p.displayName;
+    const rawStatus = typeof p.status === 'number' ? ['Available', 'Invited', 'In game'][p.status] : p.status;
+    const statusText = rawStatus || 'Available';
     const status = document.createElement('span');
     status.className = 'ttt-badge-status';
-    status.textContent = 'Available';
+    status.textContent = statusText;
+    if (statusText === 'In game') { status.style.background = 'rgb(251 113 133 / .15)'; status.style.color = 'var(--ttt-mark-o)'; status.style.borderColor = 'rgb(251 113 133 / .4)'; }
+    else if (statusText === 'Invited') { status.style.background = 'rgb(251 191 36 / .15)'; status.style.color = 'var(--ttt-status-playing)'; status.style.borderColor = 'rgb(251 191 36 / .4)'; }
     const wrap = document.createElement('span');
     wrap.className = 'd-inline-flex align-items-center gap-2';
     wrap.append(name, status);
@@ -109,10 +113,11 @@ function renderOnline(players) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-sm btn-primary';
-      // One outgoing at a time (FR-33): while pending, every Invite is disabled
-      // so the user can't hit Invite.AlreadyPending by accident.
-      const locked = !!pendingInvitationId;
-      btn.textContent = locked ? 'Waiting…' : 'Invite';
+      // Invite only when Available (per docs §4.3). In game / Invited stays disabled with this reason.
+      const notAvailable = statusText !== 'Available';
+      const locked = !!pendingInvitationId || notAvailable;
+      btn.textContent = notAvailable ? statusText : locked ? 'Waiting…' : 'Invite';
+      btn.title = notAvailable ? `${p.displayName} is ${statusText === 'In game' ? 'in a game' : 'already invited'} right now.` : '';
       if (locked) { btn.disabled = true; btn.classList.add('is-pressed'); btn.setAttribute('aria-pressed', 'true'); }
       btn.addEventListener('click', async () => {
         btn.disabled = true;
