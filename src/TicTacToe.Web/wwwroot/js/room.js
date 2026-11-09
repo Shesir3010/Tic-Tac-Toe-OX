@@ -227,10 +227,16 @@ function hideRematch() { rematchStatus.hidden = true; }
 
 function startGrace(secondsLeft) {
   wasInGrace = true;
-  let left = Number(secondsLeft) || 60;
+  const incoming = Number(secondsLeft) || 60;
+  if (graceTimer) {
+    // Same outage, second page hop: never jump back up — countdown only moves forward.
+    const shown = Number(graceSeconds.textContent) || incoming;
+    graceSeconds.textContent = String(Math.min(shown, incoming));
+    return;
+  }
+  let left = incoming;
   graceBanner.hidden = false;
   graceSeconds.textContent = String(left);
-  if (graceTimer) clearInterval(graceTimer);
   graceTimer = setInterval(() => {
     left -= 1;
     graceSeconds.textContent = String(Math.max(0, left));

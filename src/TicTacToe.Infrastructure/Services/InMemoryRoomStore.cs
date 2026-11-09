@@ -138,7 +138,8 @@ public sealed class InMemoryRoomStore : IRoomStore
             var room = Find(roomId);
             if (room is null || room.Status != RoomStatus.Playing) return;
             if (!IsParticipant(room, playerId)) return;
-            if (room.PlayerXId == playerId) room.XDisconnectDeadline = deadline; else room.ODisconnectDeadline = deadline;
+            // Keep the first deadline — page hops during the same outage must not restart the countdown.
+            if (room.PlayerXId == playerId) room.XDisconnectDeadline ??= deadline; else room.ODisconnectDeadline ??= deadline;
         }
     }
 
