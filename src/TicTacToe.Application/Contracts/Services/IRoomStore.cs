@@ -15,7 +15,7 @@ public interface IRoomStore
     (RoomState? room, string errorCode, bool forfeit, IReadOnlyList<int> moves, GameOutcome outcome) Leave(Guid roomId, Guid playerId);
     (RoomState? room, string errorCode) RequestRematch(Guid roomId, Guid playerId);
     void MarkDisconnected(Guid roomId, Guid playerId, DateTimeOffset deadline);
-    void MarkConnected(Guid roomId, Guid playerId);
+    bool MarkConnected(Guid roomId, Guid playerId);
     RoomSweepResult SweepExpired(TimeProvider clock, int graceSeconds);
 }
 

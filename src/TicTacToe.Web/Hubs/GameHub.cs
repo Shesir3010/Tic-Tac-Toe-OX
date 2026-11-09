@@ -60,12 +60,15 @@ public sealed class GameHub(IPresenceTracker presence, IMediator mediator, IInvi
         if (result.IsSuccess && result.Value is not null)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"room-{roomId}");
-            // Reconnect cancels grace for this player.
+            // Reconnect cancels grace for this player — only broadcast when it actually was in grace,
+            // otherwise every 5s resync poll would hide the opponent's countdown.
             if (Guid.TryParse(Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
-                rooms.MarkConnected(roomId, userId);
-                await Clients.Group($"room-{roomId}").SendAsync("PlayerReconnected", new { userId = userId.ToString() });
-                await BroadcastOnline();
+                if (rooms.MarkConnected(roomId, userId))
+                {
+                    await Clients.Group($"room-{roomId}").SendAsync("PlayerReconnected", new { userId = userId.ToString() });
+                    await BroadcastOnline();
+                }
             }
         }
         return result;

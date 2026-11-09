@@ -135,15 +135,17 @@ public sealed class InMemoryRoomStore : IRoomStore
         }
     }
 
-    public void MarkConnected(Guid roomId, Guid playerId)
+    public bool MarkConnected(Guid roomId, Guid playerId)
     {
         var gate = GetLock(roomId);
-        if (gate is null) return;
+        if (gate is null) return false;
         lock (gate)
         {
             var room = Find(roomId);
-            if (room is null) return;
+            if (room is null) return false;
+            var wasDisconnected = (room.PlayerXId == playerId ? room.XDisconnectDeadline : room.ODisconnectDeadline) is not null;
             if (room.PlayerXId == playerId) room.XDisconnectDeadline = null; else room.ODisconnectDeadline = null;
+            return wasDisconnected;
         }
     }
 
