@@ -154,13 +154,15 @@
 
 ## M11 — Rooms
 
-- [ ] `MakeOnlineMoveCommand` / `LeaveRoomCommand` / `RequestRematchCommand` / `GetRoomQuery`
-- [ ] Per-room locks with the 10-race contract unit-tested (store level, mocked seams, fake time)
-- [ ] Both-rows-one-transaction test (mocked UoW)
-- [ ] Leave-forfeit test (mid-game leave = loss)
-- [ ] 60 s grace with fake `TimeProvider` (unit) + countdown on both clients
-- [ ] `RoomCleanupService` (5 s tick: forfeit / orphaned close without saves / invitation expiry)
-- [ ] W-3, W-4, W-6, W-7, W-9 passed
+- [x] `MakeOnlineMoveCommand` / `LeaveRoomCommand` / `RequestRematchCommand` / `GetRoomQuery`
+- [x] Per-room locks with the 10-race contract unit-tested (store level, mocked seams, fake time)
+- [x] Both-rows-one-transaction test (mocked UoW)
+- [x] Leave-forfeit test (mid-game leave = loss)
+- [x] 60 s grace with fake `TimeProvider` (unit) + countdown on both clients
+- [x] `RoomCleanupService` (5 s tick: forfeit / orphaned close without saves / invitation expiry)
+- [x] W-3, W-4, W-6, W-7, W-9 passed
+
+**Evidence (M11 closed, owner-confirmed 2026-11-09):** commands + `InMemoryRoomStore` per-room locks + `RoomCleanupService` (scoped per tick) + `/Rooms/{id}` (score header, same mark colors, win-line, rematch requests, leave/winner modals, re-invite navigates, Closed keeps result) · build Release 0 warnings 0 errors · tests 138/138 · `walkthroughs/W-M11-2026-11-09.md`.
 
 ## M12 — Account extras
 
