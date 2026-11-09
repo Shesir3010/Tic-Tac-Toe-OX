@@ -17,6 +17,7 @@
         }
         <h2>Change password</h2>
         <form method="post" action="/Account/ChangePassword">
+            @Html.AntiForgeryToken()
             <div class="mb-3">
                 <label asp-for="CurrentPassword" class="form-label">Current password</label>
                 <input asp-for="CurrentPassword" type="password" class="form-control" autocomplete="current-password" />
@@ -43,17 +44,18 @@
         <h2>Danger zone</h2>
         <p>Deleting your account forfeits any active game, removes your matches, and your opponent’s history will show “Deleted player”.</p>
         <form method="post" action="/Account/DeleteAccount">
+            @Html.AntiForgeryToken()
             <div class="mb-3">
-                <label asp-for="@del.Password" class="form-label">Password</label>
-                <input asp-for="@del.Password" type="password" class="form-control" autocomplete="current-password" />
+                <label for="delPassword" class="form-label">Password</label>
+                <input id="delPassword" name="Password" type="password" class="form-control" autocomplete="current-password" required />
                 @if (TempData["ProfileFieldError"]?.ToString() == "Password")
                 {
                     <span class="text-danger">Current password is incorrect.</span>
                 }
             </div>
             <div class="mb-3">
-                <label asp-for="@del.ConfirmUsername" class="form-label">Type your username (@User.Identity?.Name) to confirm</label>
-                <input asp-for="@del.ConfirmUsername" class="form-control" autocomplete="off" />
+                <label for="delUsername" class="form-label">Type your username (@User.Identity?.Name) to confirm</label>
+                <input id="delUsername" name="ConfirmUsername" class="form-control" autocomplete="off" required />
             </div>
             <button class="btn w-100" style="background:var(--ttt-danger);color:#fff" type="submit">Delete account</button>
         </form>
