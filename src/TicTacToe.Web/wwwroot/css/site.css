@@ -248,6 +248,14 @@ ttt-card, .ttt-card {
 .ttt-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 .ttt-modal-accept { min-width: 120px; }
 
+.ttt-room-head { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; }
+.ttt-room-side { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ttt-text-secondary); }
+.ttt-room-side.is-you { color: var(--ttt-text-primary); }
+.ttt-room-vs { color: var(--ttt-text-muted); font-size: .85rem; font-weight: 700; }
+.ttt-resume { max-width: 960px; border-radius: var(--ttt-radius-card); box-shadow: var(--ttt-shadow-card); }
+.ttt-badge-status.is-ingame { background: rgb(251 113 133 / .15); color: var(--ttt-mark-o); border-color: rgb(251 113 133 / .4); }
+.ttt-badge-status.is-invited { background: rgb(251 191 36 / .15); color: var(--ttt-status-playing); border-color: rgb(251 191 36 / .4); }
+
 @media (prefers-reduced-motion: reduce) {
   .ttt-cell, .ttt-winning, .ttt-win-line { transition: none; }
   .ttt-modal.show .ttt-modal-card { animation: none; }

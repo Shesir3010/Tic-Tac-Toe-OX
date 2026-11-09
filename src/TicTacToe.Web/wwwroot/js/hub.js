@@ -104,8 +104,8 @@ function renderOnline(players) {
     const status = document.createElement('span');
     status.className = 'ttt-badge-status';
     status.textContent = statusText;
-    if (statusText === 'In game') { status.style.background = 'rgb(251 113 133 / .15)'; status.style.color = 'var(--ttt-mark-o)'; status.style.borderColor = 'rgb(251 113 133 / .4)'; }
-    else if (statusText === 'Invited') { status.style.background = 'rgb(251 191 36 / .15)'; status.style.color = 'var(--ttt-status-playing)'; status.style.borderColor = 'rgb(251 191 36 / .4)'; }
+    if (statusText === 'In game') status.classList.add('is-ingame');
+    else if (statusText === 'Invited') status.classList.add('is-invited');
     const wrap = document.createElement('span');
     wrap.className = 'd-inline-flex align-items-center gap-2';
     wrap.append(name, status);
