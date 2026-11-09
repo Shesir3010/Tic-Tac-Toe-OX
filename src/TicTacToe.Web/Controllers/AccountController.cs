@@ -99,7 +99,7 @@ public class AccountController(IAccountService accounts) : Controller
 
     [Authorize]
     [HttpGet]
-    public IActionResult Profile() => View();
+    public IActionResult Profile() => View(new ChangePasswordModel());
 
     [HttpPost]
     [ValidateAntiForgeryToken]
