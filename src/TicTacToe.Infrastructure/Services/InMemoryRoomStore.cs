@@ -156,6 +156,18 @@ public sealed class InMemoryRoomStore : IRoomStore
         }
     }
 
+    public DateTimeOffset? GetDisconnectDeadline(Guid roomId, Guid playerId)
+    {
+        var gate = GetLock(roomId);
+        if (gate is null) return null;
+        lock (gate)
+        {
+            var room = Find(roomId);
+            if (room is null || room.Status != RoomStatus.Playing) return null;
+            return room.PlayerXId == playerId ? room.XDisconnectDeadline : room.PlayerOId == playerId ? room.ODisconnectDeadline : null;
+        }
+    }
+
     public RoomSweepResult SweepExpired(TimeProvider clock, int graceSeconds)
     {
         var now = clock.GetUtcNow();

@@ -108,6 +108,16 @@ function render(room) {
   state = room;
   const st = statusOf(room);
   prevStatus = st;
+  // Server-driven grace: even if the push event was missed, the 5s poll carries OppDisconnectSecondsLeft.
+  const oppLeft = room.oppDisconnectSecondsLeft ?? room.OppDisconnectSecondsLeft;
+  if (st === 'Playing' && oppLeft != null && oppLeft > 0) {
+    wasInGrace = true;
+    if (!graceBanner.hidden && graceSeconds.textContent !== String(oppLeft)) graceSeconds.textContent = String(oppLeft);
+    if (graceBanner.hidden) startGrace(oppLeft);
+  } else if (graceBanner.hidden === false && graceTimer && graceTimer._hold !== true) {
+    // Keep local timer running between polls; only hide when server says clear.
+    if (oppLeft == null) stopGrace();
+  }
   const cells = boardEl.querySelectorAll('.ttt-cell');
   const result = room.result;
   const winning = result?.winningLine || result?.WinningLine;

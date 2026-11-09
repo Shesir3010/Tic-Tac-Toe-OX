@@ -102,7 +102,7 @@ public sealed class OnlineCommandHandlerTests
         var rooms = new Mock<IRoomStore>();
         rooms.Setup(x => x.Get(It.IsAny<Guid>())).Returns(room);
         var other = Guid.NewGuid();
-        var handler = new GetRoomQueryHandler(User(other).Object, rooms.Object);
+        var handler = new GetRoomQueryHandler(User(other).Object, rooms.Object, new FakeClock(Now));
 
         var result = await handler.Handle(new TicTacToe.Application.Features.Rooms.Online.Query.GetRoomQuery(room.Id), default);
 

@@ -16,6 +16,7 @@ public interface IRoomStore
     (RoomState? room, string errorCode) RequestRematch(Guid roomId, Guid playerId);
     void MarkDisconnected(Guid roomId, Guid playerId, DateTimeOffset deadline);
     bool MarkConnected(Guid roomId, Guid playerId);
+    DateTimeOffset? GetDisconnectDeadline(Guid roomId, Guid playerId);
     RoomSweepResult SweepExpired(TimeProvider clock, int graceSeconds);
 }
 

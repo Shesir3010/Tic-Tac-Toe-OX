@@ -4,6 +4,13 @@
 }
 
 <meta name="ttt:authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
+@if (ViewBag.ActiveRoomId is not null)
+{
+    <div class="alert alert-info d-flex justify-content-between align-items-center ttt-resume" role="status">
+        <span>Your game is still running.</span>
+        <a class="btn btn-sm btn-primary" href="/Rooms/@ViewBag.ActiveRoomId">Continue game</a>
+    </div>
+}
 <div class="ttt-home">
     <aside id="lobby" class="ttt-lobby" aria-label="Online players">
         <div class="ttt-lobby-head">

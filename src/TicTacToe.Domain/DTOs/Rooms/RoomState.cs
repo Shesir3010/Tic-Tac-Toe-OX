@@ -11,4 +11,5 @@ public sealed record RoomState(
     Player? Turn,
     Guid PlayerXId,
     Guid PlayerOId,
-    GameResult? Result);
+    GameResult? Result,
+    int? OppDisconnectSecondsLeft = null);
