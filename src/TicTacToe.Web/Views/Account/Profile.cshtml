@@ -1,0 +1,65 @@
+@* Profile — change password + delete account (M12). *@
+@model TicTacToe.Web.Models.ChangePasswordModel
+@{
+    ViewData["Title"] = "Profile";
+    var del = new TicTacToe.Web.Models.DeleteAccountModel();
+}
+<div class="ttt-auth">
+    <div class="ttt-card ttt-auth-card">
+        <h1>Profile</h1>
+        @if (TempData["ProfileSuccess"] is not null)
+        {
+            <div class="alert alert-success">@TempData["ProfileSuccess"]</div>
+        }
+        @if (TempData["ProfileError"] is not null)
+        {
+            <div class="alert alert-danger">@TempData["ProfileError"]</div>
+        }
+        <h2>Change password</h2>
+        <form method="post" action="/Account/ChangePassword">
+            <div class="mb-3">
+                <label asp-for="CurrentPassword" class="form-label">Current password</label>
+                <input asp-for="CurrentPassword" type="password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+                @if (TempData["ProfileFieldError"]?.ToString() == "CurrentPassword")
+                {
+                    <span class="text-danger">Current password is incorrect.</span>
+                }
+            </div>
+            <div class="mb-3">
+                <label asp-for="NewPassword" class="form-label">New password</label>
+                <input asp-for="NewPassword" type="password" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmNewPassword" class="form-label">Confirm new password</label>
+                <input asp-for="ConfirmNewPassword" type="password" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+            </div>
+            <button class="btn btn-primary w-100 ttt-cta" type="submit">Change password</button>
+        </form>
+    </div>
+    <div class="ttt-card ttt-auth-card" style="border-color:var(--ttt-danger)">
+        <h2>Danger zone</h2>
+        <p>Deleting your account forfeits any active game, removes your matches, and your opponent’s history will show “Deleted player”.</p>
+        <form method="post" action="/Account/DeleteAccount">
+            <div class="mb-3">
+                <label asp-for="@del.Password" class="form-label">Password</label>
+                <input asp-for="@del.Password" type="password" class="form-control" autocomplete="current-password" />
+                @if (TempData["ProfileFieldError"]?.ToString() == "Password")
+                {
+                    <span class="text-danger">Current password is incorrect.</span>
+                }
+            </div>
+            <div class="mb-3">
+                <label asp-for="@del.ConfirmUsername" class="form-label">Type your username (@User.Identity?.Name) to confirm</label>
+                <input asp-for="@del.ConfirmUsername" class="form-control" autocomplete="off" />
+            </div>
+            <button class="btn w-100" style="background:var(--ttt-danger);color:#fff" type="submit">Delete account</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

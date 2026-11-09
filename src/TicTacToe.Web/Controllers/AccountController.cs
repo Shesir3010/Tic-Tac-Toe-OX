@@ -77,6 +77,55 @@ public class AccountController(IAccountService accounts) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel model, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid) return RedirectToAction(nameof(Profile));
+        var result = await accounts.ChangePasswordAsync(model.CurrentPassword, model.NewPassword, cancellationToken);
+        if (!result.Succeeded)
+        {
+            TempData["ProfileError"] = result.ErrorMessage ?? "Could not change password.";
+            if (result.ErrorCode == "Auth.WrongPassword")
+            {
+                TempData["ProfileFieldError"] = "CurrentPassword";
+            }
+        }
+        else
+        {
+            TempData["ProfileSuccess"] = "Password changed.";
+        }
+        return RedirectToAction(nameof(Profile));
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult Profile() => View();
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> DeleteAccount(DeleteAccountModel model, CancellationToken cancellationToken)
+    {
+        if (User.Identity?.Name is not null && !string.Equals(model.ConfirmUsername, User.Identity.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            TempData["ProfileError"] = "Type your username to confirm delete.";
+            return RedirectToAction(nameof(Profile));
+        }
+        var result = await accounts.DeleteAccountAsync(model.Password, cancellationToken);
+        if (!result.Succeeded)
+        {
+            TempData["ProfileError"] = result.ErrorMessage ?? "Could not delete account.";
+            if (result.ErrorCode == "Auth.WrongPassword")
+            {
+                TempData["ProfileFieldError"] = "Password";
+            }
+            return RedirectToAction(nameof(Profile));
+        }
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await accounts.LogoutAsync();

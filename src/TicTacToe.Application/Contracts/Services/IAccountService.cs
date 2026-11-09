@@ -8,4 +8,8 @@ public interface IAccountService
     Task<AccountLoginResult> LoginAsync(string usernameOrEmail, string password, CancellationToken cancellationToken);
 
     Task LogoutAsync();
+
+    Task<AccountPasswordResult> ChangePasswordAsync(string currentPassword, string newPassword, CancellationToken cancellationToken);
+
+    Task<AccountPasswordResult> DeleteAccountAsync(string password, CancellationToken cancellationToken);
 }
