@@ -97,6 +97,7 @@ public sealed class InMemoryRoomStore : IRoomStore
             room.Status = RoomStatus.Finished;
             var winnerMark = MarkOf(room, playerId) == Player.X ? Player.O : Player.X;
             var outcome = winnerMark == Player.X ? GameOutcome.XWins : GameOutcome.OWins;
+            room.ForfeitOutcome = outcome;
             return (ToState(room), "", true, room.Moves.ToArray(), outcome);
         }
     }
@@ -117,6 +118,7 @@ public sealed class InMemoryRoomStore : IRoomStore
             room.Board = Board.Empty();
             room.Moves.Clear();
             room.Status = RoomStatus.Playing;
+            room.ForfeitOutcome = null;
             room.XRematchRequested = false;
             room.ORematchRequested = false;
             // The player who requested the rematch begins the next game as X (inviter rule applies to rematch too).
@@ -197,6 +199,7 @@ public sealed class InMemoryRoomStore : IRoomStore
                     var winner = xPast ? room.PlayerOId : room.PlayerXId;
                     room.Status = RoomStatus.Finished;
                     var outcome = winner == room.PlayerXId ? GameOutcome.XWins : GameOutcome.OWins;
+                    room.ForfeitOutcome = outcome;
                     forfeits.Add(new RoomFinish(ToState(room), room.Moves.ToArray(), winner, loser));
                     room.XDisconnectDeadline = null;
                     room.ODisconnectDeadline = null;
@@ -232,5 +235,7 @@ public sealed class InMemoryRoomStore : IRoomStore
         r.Id, r.Status, r.Board.Cells.ToArray(),
         r.Status == RoomStatus.Playing ? TurnOf(r.Board) : null,
         r.PlayerXId, r.PlayerOId,
-        (r.Status == RoomStatus.Finished || r.Status == RoomStatus.Closed) ? Rules.Evaluate(r.Board) : null);
+        (r.Status == RoomStatus.Finished || r.Status == RoomStatus.Closed)
+            ? r.ForfeitOutcome is not null ? new GameResult(r.ForfeitOutcome.Value, null) : Rules.Evaluate(r.Board)
+            : null);
 }

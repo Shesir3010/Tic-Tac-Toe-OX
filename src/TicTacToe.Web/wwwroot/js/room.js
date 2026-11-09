@@ -151,17 +151,21 @@ function render(room) {
     errorEl.hidden = true;
   } else if (st === 'Finished') {
     let text = winText(result);
-    if (rematchRequested) text += ' Waiting for opponent…';
     statusEl.textContent = text;
-    rematchBtn.hidden = false;
-    rematchBtn.disabled = rematchRequested;
-    rematchBtn.textContent = rematchRequested ? 'Waiting…' : 'Rematch';
     errorEl.hidden = true;
-    // Offline-timeout forfeit: we were in grace, now Finished with our win → win popup + home.
-    if (wasInGrace && prev === 'Playing' && text === 'You win!') {
+    const isForfeit = !winning;
+    if (isForfeit) {
+      rematchBtn.hidden = true;
+      hideRematch();
       stopGrace();
-      showWinModal();
+      showResultModal(text);
       setTimeout(() => { if (winModal.hidden === false) window.location.href = '/'; }, 3000);
+    } else {
+      if (rematchRequested) text += ' Waiting for opponent…';
+      statusEl.textContent = text;
+      rematchBtn.hidden = false;
+      rematchBtn.disabled = rematchRequested;
+      rematchBtn.textContent = rematchRequested ? 'Waiting…' : 'Rematch';
     }
   } else {
     statusEl.textContent = 'Game ended.';
@@ -218,6 +222,13 @@ rematchBtn.addEventListener('click', async () => {
 btnLeftHome.addEventListener('click', () => { window.location.href = '/'; });
 btnWinHome.addEventListener('click', () => { window.location.href = '/'; });
 function showWinModal() { winModal.hidden = false; btnWinHome.focus(); }
+function showResultModal(text) {
+  document.querySelector('#win-modal h3').textContent = text === 'You win!' ? 'You win!' : text === "It's a draw." ? "It's a draw." : 'You lose';
+  document.querySelector('#win-modal p').textContent = text === 'You win!'
+    ? 'Opponent didn’t come back — forfeit recorded in history.'
+    : text === "It's a draw." ? 'Result recorded in history.' : 'Opponent wins by forfeit — recorded in history.';
+  showWinModal();
+}
 function showLeftModal(msg) {
   document.querySelector('#left-modal p').textContent = msg || 'Opponent left the game. You win!';
   leftModal.hidden = false; btnLeftHome.focus();
