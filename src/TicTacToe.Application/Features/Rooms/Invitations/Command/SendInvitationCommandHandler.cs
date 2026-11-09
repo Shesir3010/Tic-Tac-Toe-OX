@@ -9,12 +9,14 @@ public sealed class SendInvitationCommandHandler : ICommandHandler<SendInvitatio
 {
     private readonly ICurrentUser _currentUser;
     private readonly IInvitationManager _invitations;
+    private readonly IPresenceTracker _presence;
     private readonly TimeProvider _clock;
 
-    public SendInvitationCommandHandler(ICurrentUser currentUser, IInvitationManager invitations, TimeProvider clock)
+    public SendInvitationCommandHandler(ICurrentUser currentUser, IInvitationManager invitations, IPresenceTracker presence, TimeProvider clock)
     {
         _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
         _invitations = invitations ?? throw new ArgumentNullException(nameof(invitations));
+        _presence = presence ?? throw new ArgumentNullException(nameof(presence));
         _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
 
@@ -29,19 +31,20 @@ public sealed class SendInvitationCommandHandler : ICommandHandler<SendInvitatio
         var (ok, inv, code) = _invitations.Send(_currentUser.UserId.Value, command.TargetUserId, _clock);
         if (!ok)
         {
-            return Task.FromResult(OperationResult<InvitationStateDto>.Failure(new OperationError(code, InviteMessage(code))));
+            var targetName = _presence.GetOnline().FirstOrDefault(p => p.UserId == command.TargetUserId)?.DisplayName ?? "Player";
+            return Task.FromResult(OperationResult<InvitationStateDto>.Failure(new OperationError(code, InviteMessage(code, targetName))));
         }
 
         return Task.FromResult(OperationResult<InvitationStateDto>.Success(
             new InvitationStateDto(inv!.Id, inv.FromUserId, inv.ToUserId, inv.Status.ToString(), 30)));
     }
 
-    private static string InviteMessage(string code) => code switch
+    private static string InviteMessage(string code, string targetName) => code switch
     {
         "Invite.Self" => "You can't invite yourself.",
-        "Invite.Offline" => "Player is offline.",
-        "Invite.Busy" => "Player is busy right now.",
-        "Invite.Cooldown" => "You can try inviting again in a moment.",
+        "Invite.Offline" => $"{targetName} is offline.",
+        "Invite.Busy" => $"{targetName} is busy right now.",
+        "Invite.Cooldown" => $"You can try inviting {targetName} again in a moment.",
         "Invite.AlreadyPending" => "You already have an invitation waiting.",
         _ => "You can't do that.",
     };

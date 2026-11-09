@@ -23,7 +23,9 @@ public sealed class InvitationCommandHandlerTests
         var user = User();
         var invocations = new Mock<IInvitationManager>();
         invocations.Setup(x => x.Send(Me, Target, It.IsAny<TimeProvider>())).Returns((false, null, "Invite.Self"));
-        var handler = new SendInvitationCommandHandler(user.Object, invocations.Object, new FakeClock(Now));
+        var presence = new Mock<IPresenceTracker>();
+        presence.Setup(x => x.GetOnline()).Returns(Array.Empty<TicTacToe.Domain.DTOs.Rooms.OnlinePlayerDto>());
+        var handler = new SendInvitationCommandHandler(user.Object, invocations.Object, presence.Object, new FakeClock(Now));
 
         var result = handler.Handle(new SendInvitationCommand(Target), default).GetAwaiter().GetResult();
 
@@ -38,7 +40,7 @@ public sealed class InvitationCommandHandlerTests
         var pending = new Invitation { Id = Guid.NewGuid(), FromUserId = Me, ToUserId = Target };
         var invocations = new Mock<IInvitationManager>();
         invocations.Setup(x => x.Send(Me, Target, It.IsAny<TimeProvider>())).Returns((true, pending, ""));
-        var handler = new SendInvitationCommandHandler(user.Object, invocations.Object, new FakeClock(Now));
+        var handler = new SendInvitationCommandHandler(user.Object, invocations.Object, new Mock<IPresenceTracker>().Object, new FakeClock(Now));
 
         var result = handler.Handle(new SendInvitationCommand(Target), default).GetAwaiter().GetResult();
 
