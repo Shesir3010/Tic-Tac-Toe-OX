@@ -210,5 +210,5 @@ public sealed class InMemoryRoomStore : IRoomStore
         r.Id, r.Status, r.Board.Cells.ToArray(),
         r.Status == RoomStatus.Playing ? TurnOf(r.Board) : null,
         r.PlayerXId, r.PlayerOId,
-        r.Status == RoomStatus.Finished ? Rules.Evaluate(r.Board) : null);
+        (r.Status == RoomStatus.Finished || r.Status == RoomStatus.Closed) ? Rules.Evaluate(r.Board) : null);
 }

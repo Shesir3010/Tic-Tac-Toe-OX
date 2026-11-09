@@ -54,14 +54,21 @@ async function startHub() {
   hubConn.on('RematchRequested', (p) => { showRematch(`Rematch requested by ${p.byName || 'opponent'} — press Rematch to accept.`); });
   hubConn.on('PlayerDisconnected', (p) => startGrace(p.secondsLeft || 60));
   hubConn.on('PlayerReconnected', () => stopGrace());
-  hubConn.on('RoomClosed', (p) => { toast(`Room closed (${p.reason}).`, 'info'); statusEl.textContent = 'Room closed.'; });
+  hubConn.on('RoomClosed', (p) => {
+    toast(`Room closed (${p.reason}).`, 'info');
+    if (state) render(state); else statusEl.textContent = 'Room closed.';
+  });
   hubConn.on('PlayerLeft', (p) => {
     if (!p?.room) { showLeftModal('Opponent left the game. You win!'); return; }
     render(p.room);
-    // Mid-game leave = forfeit. Staying player sees the winner modal, then goes home.
-    if (statusOf(p.room) === 'Finished' || statusOf(p.room) === 'Closed') {
+    // Mid-game leave (Finished = forfeit): staying player wins and returns home.
+    // Post-game leave (Closed): result already shown — just offer home, no winner claim.
+    if (statusOf(p.room) === 'Finished') {
       showLeftModal('Opponent left the game. You win!');
       setTimeout(() => { if (leftModal.hidden === false) window.location.href = '/'; }, 4000);
+    } else if (statusOf(p.room) === 'Closed') {
+      showLeftModal('Opponent left. Room closed.');
+      setTimeout(() => { if (leftModal.hidden === false) window.location.href = '/'; }, 6000);
     }
   });
   await hubConn.start();
@@ -102,24 +109,27 @@ function render(room) {
     cell.disabled = st !== 'Playing' || !isMyTurn(room);
     cell.setAttribute('aria-label', `Row ${Math.floor(i / 3) + 1}, column ${(i % 3) + 1}, ${v === 0 ? 'X' : v === 1 ? 'O' : 'empty'}`);
   });
-  if (st === 'Finished' && winning) {
+  if ((st === 'Finished' || st === 'Closed') && winning) {
     winning.forEach(i => cells[i].classList.add('ttt-winning'));
     drawWinLine(winning);
   } else {
     drawWinLine(null);
   }
   const markLabel = myMark(room) === 0 ? 'X' : 'O';
+  const winText = (r) => {
+    const outcome = r?.outcome ?? r?.Outcome;
+    if (outcome === 3) return "It's a draw.";
+    if (outcome === 1) return myMark(room) === 0 ? 'You win!' : 'X wins!';
+    if (outcome === 2) return myMark(room) === 1 ? 'You win!' : 'O wins!';
+    return 'Finished.';
+  };
   if (st === 'Playing') {
     statusEl.textContent = isMyTurn(room) ? `Your turn as ${markLabel}` : `Opponent's turn`;
     rematchBtn.hidden = true;
     hideRematch();
     errorEl.hidden = true;
   } else if (st === 'Finished') {
-    const outcome = result?.outcome ?? result?.Outcome;
-    let text = 'Finished.';
-    if (outcome === 3) text = "It's a draw.";
-    else if (outcome === 1) text = myMark(room) === 0 ? 'You win!' : 'X wins!';
-    else if (outcome === 2) text = myMark(room) === 1 ? 'You win!' : 'O wins!';
+    let text = winText(result);
     if (rematchRequested) text += ' Waiting for opponent…';
     statusEl.textContent = text;
     rematchBtn.hidden = false;
@@ -127,7 +137,7 @@ function render(room) {
     rematchBtn.textContent = rematchRequested ? 'Waiting…' : 'Rematch';
     errorEl.hidden = true;
   } else {
-    statusEl.textContent = 'Room closed.';
+    statusEl.textContent = `Room closed. ${winText(result)}`;
     rematchBtn.hidden = true;
     hideRematch();
     cells.forEach(c => c.disabled = true);
